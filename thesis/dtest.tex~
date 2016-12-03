@@ -1,0 +1,230 @@
+
+\documentclass[12pt]{article}
+
+
+\usepackage{amsfonts,amsthm,amssymb,amsmath}
+
+\usepackage{fancyhdr}
+
+\pagestyle{fancy}
+\rhead{\today}
+\lhead{ }
+%\title{Arithmetic in Game Theory}
+\author{Samson Bassett}
+
+\begin{document}
+%\maketitle
+
+
+
+\begin{lemma}
+bad case cannot happen.
+\end{lemma}
+
+So $v$ is the relay vertex of the free wedge $W$, such that the incoming and outgoing arcs of $v$ are incident to $v$ and the external vertices of $W$.
+Let $v_L,v_R$ be the left and right external vertices of $W$, respectively.  Let $(y,v)$ and $(v,z)$ be virtual arcs of $H$. 
+
+Let $H,C,J,J'$ be given from the proof by Agelos.
+
+%Let $v$ be the relay vertex of the wedge $W$, $(y,v)$ and $(v,z)$ be virtual arcs of $H$.
+
+If $v\notin C$, then there is only one pass of $J'$ through $v$, and it is not marked, which is a contradiction, since there is one marked 
+pass of $J'$ through $v$ for each virtual arc of $W$, and $W$ has at least one virtual arc.  
+Hence $v\in C$, and similarly $v_R,v_L \in C$ also.  Hence for some $j$, $v=x_j$ and $e_j,e_{j+1}$ are incident to $v$.  Since the 
+virtual edges $yv$ and $vz$ are consecutive in $H$, $y,v_R,v,v_L,z$ are visited in order on $J'$, which implies $v_L=x_{j+1}$, $z=x_{j+2}$.  
+!!!assuming we dont reach y or x, we must deal with this special case; later!!!!
+
+%By 
+%statement $(1)$, the pass $e_j$ is in an unmarked pass $J'$ through $v$.  
+%This implies $W$ has at least two virtual arcs, and hence at least one internal vertex.  
+Let $u$ be an internal vertex of $W$ that is adjacent to $v_L$, and let $r=uv$ (possibly u=vR).  
+
+
+
+If $e_{j+1}'$ does not exist in $J'$, then $e_{j+1}$ is in two marked passes of $J'$ (one through $v$ and one through $v_L$, a contradiction.   
+Hence $e_{j+1}'$ is an edge of $J'$.  Thus since $f_j$ is in $J$, we know the pass $x_{j-1}e_jx_je_{j+1}'$ is an unmarked pass of $J'$.  
+
+
+
+
+
+
+
+By the definition of $J$, since it 
+contains $f_{j+1}$, 
+we know $x_je_{j+1}x_{j+1}e_{j+2}'x_{j+2}$ is an unmarked pass of $J'$. 
+
+
+
+
+
+ %If $d(v)=2$, then 
+
+
+
+
+
+
+
+
+
+
+
+
+
+$G=(V,E)$ is a finite $2$-connected graph.  % finding a Hamiltonian cycle in $G^2$ is trivial.  So $G$ has at least four vertices.  
+
+\begin{eqnarray*}
+&&T(p,v,\alpha)  = (\textbf{Rule\_Zero}(v),\beta)\\
+&&T(p,v,\beta) = (\textbf{Rule\_One}(p,v),\beta); 1\le p\le d(v)+1\\
+&&T(d(v)+2,v,\beta) = (\textbf{Rule\_Two}(v),\beta)\\
+&&T(d(v)+3,v,\beta) = (\textbf{Rule\_Three}(v),\beta)\\
+\end{eqnarray*}
+
+
+
+\begin{center}\begin{tabular*}{\textwidth}{c}\hline\end{tabular*}\end{center}
+\noindent \textbf{procedure Port-Numbering}(vertex $v$)
+%\begin{center}\begin{tabular*}{0.5\textwidth}{c}\hline\end{tabular*}\end{center}
+\begin{algorithmic}[1] 
+ 
+
+\STATE{Let $a$ be the incoming arc of $v$} %\label{line:t1}
+\STATE{Let $b$ be the outgoing arc of $v$}%\label{line:t2}
+\STATE{Let $k$ be the number such that $v$ is a relay vertex of $k$ distinct wedges} %\label{line:t3}
+\STATE{Let $L_v$ be an empty list of port numbers}
+\IF{ $k > 0$} %\label{line:t4}
+\STATE{Let $\{W_i\}_{i=1}^k$ be the list of ordered wedges at $v$}% \label{line:t5}
+\ENDIF %\label{line:t6}
+
+
+
+
+
+\IF{$a=b^{-1}$} \label{line:sr1}
+\STATE{$L_v \leftarrow 1$}
+\STATE{Assign $d(v)+3$ to $b$} \label{line:backtrack}
+\IF{$k>0$}
+\STATE{Assign $[2,\sum_{i=1}^ks_i+1]$ to $\{W_i\}_{i=1}^k$}\label{line:fill0} %\COMMENT{\emph{ Figures \ref{fig:26}, \ref{fig:36}, \ref{fig:46}  }}
+\ENDIF
+\ENDIF
+
+
+
+
+
+
+\IF{$a\ne b^{-1}$ and both $a$ and $b$ are isolated arcs of $v$}\label{line:sr2}
+%\STATE (Figures \ref{fig:11}, \ref{fig:21}, \ref{fig:31}, \ref{fig:41})
+\STATE{Assign $1$ to $a^{-1}$}\label{line:iso1}
+\STATE{Assign $2$ to $b$} \label{line:iso2}%\COMMENT{\emph{ Figures \ref{fig:11}, \ref{fig:21}, \ref{fig:31}, \ref{fig:41}  }}
+\IF{$k>0$}
+\STATE{Assign $[3,\sum_{i=1}^ks_i+2]$ to $\{W_i\}_{i=1}^k$}\label{line:fill1}
+\ENDIF
+\ENDIF
+
+ 
+
+\IF{$a\ne b^{-1}$ and both $a$ and $b$ are not isolated arcs of $v$}\label{line:sr3}
+  %\STATE{$L \leftarrow 1$}
+%\IF{$W_1$ is both right tied and left tied}
+ %Figure \ref{fig:15})
+   %  \STATE{Assign $[1,s_1]$ to $W_1$} \label{line:bothtied} %\COMMENT{\emph{  Figure \ref{fig:15} }}
+% \ELSE
+   \STATE{Pick $j$ such that $a^{-1}$ is a rib of $W_j$}
+   \STATE{Pick $j'$ such that $b^{-1}$ is a rib of $W_{j'}$}
+% \STATE{$L \leftarrow 1, d(v)+2-s_j, d(v)+3 $}
+  %\STATE{$L \leftarrow d(v)+2-s_j $}
+% \STATE{$L \leftarrow d(v)+3$}
+
+
+   \IF{$j=j'$}
+         \STATE{$L_v \leftarrow 1, d(v)+2-s_j, d(v)+3 $}
+      %   \STATE{$L \leftarrow 1$}
+ % \STATE{$L \leftarrow d(v)+2-s_j $}
+      \IF{$W_j$ is either left tied or right tied}
+           % Figures \ref{fig:25}, \ref{fig:35}
+         %\STATE{$L \leftarrow d(v)+2-s_j $}
+         \STATE{Assign $[d(v)+3-s_j , d(v)+2]$ to $W_j$} \label{line:sametied} %\COMMENT{\emph{  Figures \ref{fig:25}, \ref{fig:35}  }}
+    \ENDIF
+    \IF{$W_j$ is a free wedge}
+      % so W_p not tied wedge
+        % Figures \ref{fig:45} 
+             %  \STATE{$L \leftarrow  d(v)+2 - s_j$}
+       \STATE{Assign $[d(v)+4-s_j,d(v)+2]\cup \{ \degr(v)+3 - s_j\}$ to $W_j$} \label{line:samefree} %\COMMENT{\emph{  Figure \ref{fig:45} }}
+    \ENDIF % matches wp free
+
+    \IF{$k \ge 2$}
+      \STATE{Assign $[2,\sum_{i\ne j}s_i+1]$ to $\{W_i\}_{i\ne j}$ }\label{line:fill2}
+    \ENDIF % matches k 2
+
+  \ENDIF
+
+
+
+
+
+ \IF{$j\ne j'$} %label p and q seperately, then do the rest if any
+
+%    Figures \ref{fig:14}, \ref{fig:24}, \ref{fig:34}, \ref{fig:44}
+    \STATE{Assign  $[2,s_{j'}+1]$ to $W_{j'}$}\label{line:bothout} %\COMMENT{\emph{  Figures \ref{fig:14}, \ref{fig:24}, \ref{fig:34}, \ref{fig:44} }}
+    \STATE{Assign $[d(v)+5-s_{j}  , 1]$ to $W_{j}$}\label{line:bothin}
+
+
+    \IF{$k \ge 3$}
+      \STATE{Assign $[ s_{j'}+2 ,\sum_{i\ne j, i\ne j'}s_i+1]$ to $\{W_i\}_{i\ne j, i\ne j'}$ }\label{line:fill3}
+    \ENDIF
+
+  \ENDIF % matches p=q
+
+
+
+%\ENDIF % matches W1 double tied
+
+\ENDIF %end of case
+
+\IF{$a\ne b^{-1}$, $a  $ is an isolated arc of $v$ but $b$ is not}\label{line:sr4}
+\STATE{Assign $1$ to $a^{-1}$}\label{line:only1}
+\STATE{Pick $j$ such that $b^{-1}$ is a rib of $W_j$}
+%Figures \ref{fig:13}, \ref{fig:23}, \ref{fig:33}, \ref{fig:43}
+
+  \STATE{Assign $[2,s_j+1]$ to $W_j$}\label{line:outtied} %\COMMENT{\emph{  Figures \ref{fig:13}, \ref{fig:23}, \ref{fig:33}, \ref{fig:43} }}
+
+
+\IF{$k \ge 2$}
+  \STATE{Assign $[s_j+2,\sum_{i\ne j}s_i+1]$ to $\{W_i\}_{i\ne j}$}\label{line:fill4}
+\ENDIF
+
+\ENDIF
+
+
+
+
+
+\IF{$a\ne b^{-1}$, $b$ is an isolated arc of $v$ but $a$ is not}\label{line:sr5}
+\STATE{Assign $2$ to $b$}\label{line:only2}
+\STATE{Pick $j$ such that $a^{-1}$ is a rib of $W_j$}
+%\STATE (Figures \ref{fig:12}, \ref{fig:22}, \ref{fig:32}, \ref{fig:42})
+\STATE{Assign $[d(v)+5-s_j,1]$ to $W_j$}\label{line:intied}% \COMMENT{\emph{  Figures \ref{fig:12}, \ref{fig:22}, \ref{fig:32}, \ref{fig:42}  }}
+
+\IF{$k \ge 2$}
+  \STATE{Assign $[s_j+2,\sum_{i\ne j}s_i+1]$ to $\{W_i\}_{i\ne j}$}\label{line:fill5}
+\ENDIF
+ 
+
+
+
+ 
+\ENDIF % matches final case
+ 
+\STATE arbitrary-ports$(v,L_v)$ 
+
+\end{algorithmic} 
+\begin{center}\begin{tabular*}{\textwidth}{c}\hline\end{tabular*}\end{center}
+
+
+
+
+\end{document}
+
+

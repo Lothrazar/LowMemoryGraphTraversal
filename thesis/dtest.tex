@@ -1,0 +1,154 @@
+
+\documentclass[12pt]{article}
+
+
+\usepackage{amsfonts,amsthm,amssymb,amsmath}
+
+\usepackage{fancyhdr}
+
+\pagestyle{fancy}
+\rhead{\today}
+\lhead{ }
+%\title{Arithmetic in Game Theory}
+\author{Samson Bassett}
+
+\begin{document}
+%\maketitle
+
+
+
+
+
+ \begin{itemize} 
+\item \textbf{Rule$\_$Zero}$(v)$: Return $2$. 
+
+\item \textbf{Rule$\_$One}$(p,v)$: If $v$ was entered on port $p$, for $1\le p<d(v)$, return $p+1$.  
+
+\item \textbf{Rule$\_$Two}$(v)$: If $v$ was entered on port $d(v)$, return $d(v)$.
+
+\item \textbf{Rule$\_$Two}$(v)$: If $v$ was entered on port $d(v)+1$, return $1$ 
+
+
+
+$G=(V,E)$ is a finite $2$-connected graph.  % finding a Hamiltonian cycle in $G^2$ is trivial.  So $G$ has at least four vertices.  
+
+%\begin{eqnarray*}
+%&&T(p,v,\alpha)  = (\textbf{Rule\_Zero}(v),\beta)\\
+%&&T(p,v,\beta) = (\textbf{Rule\_One}(p,v),\beta); 1\le p\le d(v)+1\\
+%&&T(d(v)+2,v,\beta) = (\textbf{Rule\_Two}(v),\beta)\\
+%&&T(d(v)+3,v,\beta) = (\textbf{Rule\_Three}(v),\beta)\\
+%\end{eqnarray*}
+
+
+
+\begin{center}\begin{tabular*}{\textwidth}{c}\hline\end{tabular*}\end{center}
+\noindent \textbf{procedure Port-Numbering}(vertex $v$)
+%\begin{center}\begin{tabular*}{0.5\textwidth}{c}\hline\end{tabular*}\end{center}
+\begin{algorithmic}[1] 
+ 
+
+\STATE{Let $a$ be the incoming arc of $v$} %\label{line:t1}
+\STATE{Let $b$ be the outgoing arc of $v$}%\label{line:t2}
+\STATE{Let $k$ be the number such that $v$ is a relay vertex of $k$ distinct wedges} %\label{line:t3}
+\STATE{Let $L_v$ be an empty list of port numbers}
+\IF{ $k > 0$} %\label{line:t4}
+\STATE{Let $\{W_i\}_{i=1}^k$ be the list of ordered wedges at $v$}% \label{line:t5}
+\ENDIF %\label{line:t6}
+
+
+
+
+
+\IF{$a=b^{-1}$} \label{line:sr1}
+%\STATE{$L_v \leftarrow 1$}
+\STATE{Assign $d(v)$ to $b$} \label{line:backtrack}
+\IF{$k>0$}
+\STATE{Assign $[1,\sum_{i=1}^ks_i]$ to $\{W_i\}_{i=1}^k$}\label{line:fill0} %\COMMENT{\emph{ Figures \ref{fig:26}, \ref{fig:36}, \ref{fig:46}  }}
+\ENDIF
+\ENDIF
+
+
+
+
+
+
+\IF{$a\ne b^{-1}$ and both $a$ and $b$ are isolated arcs of $v$}\label{line:sr2}
+%\STATE (Figures \ref{fig:11}, \ref{fig:21}, \ref{fig:31}, \ref{fig:41})
+\STATE{Assign $1$ to $a^{-1}$}\label{line:iso1}
+\STATE{Assign $2$ to $b$} \label{line:iso2}%\COMMENT{\emph{ Figures \ref{fig:11}, \ref{fig:21}, \ref{fig:31}, \ref{fig:41}  }}
+\IF{$k>0$}
+\STATE{Assign $[3,\sum_{i=1}^ks_i+2]$ to $\{W_i\}_{i=1}^k$}\label{line:fill1}
+\ENDIF
+\ENDIF
+
+ 
+
+\IF{$a\ne b^{-1}$ and both $a$ and $b$ are not isolated arcs of $v$}\label{line:sr3}
+
+   \STATE{Pick $j$ such that $a^{-1}$ is a rib of $W_j$}
+   \STATE{Pick $j'$ such that $b^{-1}$ is a rib of $W_{j'}$}
+
+
+
+
+
+
+
+    \STATE{Assign $[1  , s_j]$ to $W_{j}$}\label{line:bothin}
+
+    \STATE{Assign  $[s_{j}+1,s_j+s_{j'}]$ to $W_{j'}$}\label{line:bothout} 
+   
+
+    \IF{$k \ge 3$}
+      \STATE{Assign $[s_j+ s_{j'}+1 ,\sum_{i\ne j, i\ne j'}s_i]$ to $\{W_i\}_{i\ne j, i\ne j'}$ }\label{line:fill3}
+    \ENDIF
+
+%\ENDIF % matches W1 double tied
+
+\ENDIF %end of case
+
+\IF{$a\ne b^{-1}$, $a  $ is an isolated arc of $v$ but $b$ is not}\label{line:sr4}
+\STATE{Assign $1$ to $a^{-1}$}\label{line:only1}
+\STATE{Pick $j$ such that $b^{-1}$ is a rib of $W_j$}
+%Figures \ref{fig:13}, \ref{fig:23}, \ref{fig:33}, \ref{fig:43}
+
+  \STATE{Assign $[2,s_j+1]$ to $W_j$}\label{line:outtied} %\COMMENT{\emph{  Figures \ref{fig:13}, \ref{fig:23}, \ref{fig:33}, \ref{fig:43} }}
+
+
+\IF{$k \ge 2$}
+  \STATE{Assign $[s_j+2,\sum_{i\ne j}s_i+1]$ to $\{W_i\}_{i\ne j}$}\label{line:fill4}
+\ENDIF
+
+\ENDIF
+
+
+
+
+
+\IF{$a\ne b^{-1}$, $b$ is an isolated arc of $v$ but $a$ is not}\label{line:sr5}
+\STATE{Assign $2$ to $b$}\label{line:only2}
+\STATE{Pick $j$ such that $a^{-1}$ is a rib of $W_j$}
+%\STATE (Figures \ref{fig:12}, \ref{fig:22}, \ref{fig:32}, \ref{fig:42})
+\STATE{Assign $[d(v)+5-s_j,1]$ to $W_j$}\label{line:intied}% \COMMENT{\emph{  Figures \ref{fig:12}, \ref{fig:22}, \ref{fig:32}, \ref{fig:42}  }}
+
+\IF{$k \ge 2$}
+  \STATE{Assign $[s_j+2,\sum_{i\ne j}s_i+1]$ to $\{W_i\}_{i\ne j}$}\label{line:fill5}
+\ENDIF
+ 
+
+
+
+ 
+\ENDIF % matches final case
+ 
+\STATE arbitrary-ports$(v,L_v)$ 
+
+\end{algorithmic} 
+\begin{center}\begin{tabular*}{\textwidth}{c}\hline\end{tabular*}\end{center}
+
+
+
+
+\end{document}
+
+

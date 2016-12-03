@@ -1,0 +1,95 @@
+
+\documentclass[12pt]{article}
+
+
+\usepackage{amsfonts,amsthm,amssymb,amsmath}
+
+\usepackage{fancyhdr}
+
+\pagestyle{fancy}
+\rhead{\today}
+\lhead{ }
+%\title{Arithmetic in Game Theory}
+\author{Samson Bassett}
+
+\begin{document}
+%\maketitle
+
+$G=(V,E)$ is a finite $2$-connected graph.  % finding a Hamiltonian cycle in $G^2$ is trivial.  So $G$ has at least four vertices.  
+Let $x$ be any vertex of $G$.  
+There exists a cycle $C$ in $G$ that contains $x$, and a vertex $y\ne x$ such that every neighbour of 
+$y$ is on $C$.  
+
+
+Definition: $C$-trail
+
+$E'$ is a set of new edges that we needed to add, each edge in $E'$ is parallel to an existing edge in $G$.  No pair 
+of vertices has more than two edges between them, the purpose of these is to increase the degree of certain vertices.
+
+Let $D$ be a component of $G-C$.  For each such $D$, there exists a set of $C$-trails (that are edge disjoint but not 
+vertex disjoint) in $G^2+E'$, such that every vertex of $D$ is in exactly 
+one $C$-trail, and every edge that is on some $C$-trail and also incident with a vertex of $C$ is in either $E$ or $E'$.
+Denoting $E_D$ as the edge set of the component $D$, so $E_D$ is the union of these trails.  
+
+
+Let $G' = (V,E(C)\cup E_D^*)$, where $E_D^*$ is the union of all $C$-trails over all components of $G-C$.  We know 
+every vertex in $G'-C$ has degree two.  next we will add edges to $C$ in $G'$ to construct an eulerian multigraph, which we will 
+call $G_\alpha$
+
+
+
+We can write $C= xg_1z\ldots d_1 y d_2 \ldots g_2$ (if an edge $e$ has a parallel edge, we write it as $e'$)
+
+
+depending on whether $g_i$s and $d_i$s have parallel edges, there are three ways to split up $C$ into paths $P_1,P_2,P_3$, while 
+deleting certain pairs of parallel edges., this transforms $G_\alpha$ into $G_\beta$, which is also a eulerian multigraph.  
+
+**there will either be a single path $P_3$, or two options of having only $P_1,P_2$***
+
+write $P_i = x_0^i e_1^i x_1 e_2^i x_2 \ldots e_{l_i}^i x_{l_i}^i$
+
+
+
+next we construct $J'$, an eulerian tour of $G_\beta$, so it is a walk that contains every edge exactly once.  this implies some 
+cyclic ordering on all the edges of $G_\beta$, so it makes sense to talk about consecutive edges of $J'$.
+
+$J'$ is constructed to have a few specific properties that are only used to prove correctness, it is chosen mostly arbitrarily, except 
+that: within some path $P_i$,  if $e_{j+1}$ has a parallel edge $e_{j+1}'$ the edges $e_j,e_{j+1}'$ are consecutive in $J'$
+
+
+
+
+define: a pass through $v$ is a path of length two with $v$ as an internal vertex of the path, such that 
+both edges are consecutive in $J'$.
+
+If a pass gets 'marked' this means it will eventually be replaced by an edge in $G^2$.
+
+For the fixed vertex $x$, mark every pass through x except for one chosen arbitrarily.
+
+pick any $v\ne x$.  if $v$ is in $G-C$, then there is only one pass through $v$( by the above 
+construction with $C$-trails), so leave this pass unmarked
+
+
+if $v$ is in $C$, then there is some pair $i,j$ such that $v=x_j^i$, $j\ne 0$.  mark all passes through $v$ except the 
+unique pass containing $e_j^i$ (in other words, the unique edge 'preceding' v on the cycle).
+
+
+now we know the following property:
+
+if $e=uv$ is any edge in $J'$, there are exactly two passes of $J'$ that contain $e$, and at most one of these is marked.  
+If $u=x$, then the pass of $J'$ through $v$ that contains $e$ is unmarked   
+
+
+finally, construct $H'$ by replacing every marked pass of $J'$ by an edge of $G^2$ (which will be a virtual edge, since $J'$ contained 
+every edge of the original graph already). $H'$ is a hamiltonian cycle of $G^2+E'$.  finally, replace every edge in $E'$ with 
+the corresponding edge in $G$, to obtain hamiltonian cycle $H$ of $G^2$. 
+
+
+
+
+
+
+
+\end{document}
+
+

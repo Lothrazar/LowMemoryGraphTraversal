@@ -1,0 +1,79 @@
+\BOOKMARK [1][-]{toc1.1}{Contents}{}
+\BOOKMARK [1][-]{section.1}{1 Kernel}{}
+\BOOKMARK [2][-]{subsection.1.1}{1.1 Identification}{section.1}
+\BOOKMARK [2][-]{subsection.1.2}{1.2 Generic helpers}{section.1}
+\BOOKMARK [2][-]{subsection.1.3}{1.3 Errors}{section.1}
+\BOOKMARK [2][-]{subsection.1.4}{1.4 Using the keyval package}{section.1}
+\BOOKMARK [2][-]{subsection.1.5}{1.5 Margin resp. width}{section.1}
+\BOOKMARK [2][-]{subsection.1.6}{1.6 Indentions}{section.1}
+\BOOKMARK [2][-]{subsection.1.7}{1.7 Styles}{section.1}
+\BOOKMARK [2][-]{subsection.1.8}{1.8 Formats}{section.1}
+\BOOKMARK [2][-]{subsection.1.9}{1.9 Label formats}{section.1}
+\BOOKMARK [2][-]{subsection.1.10}{1.10 Label separators}{section.1}
+\BOOKMARK [2][-]{subsection.1.11}{1.11 Text formats}{section.1}
+\BOOKMARK [2][-]{subsection.1.12}{1.12 Fonts}{section.1}
+\BOOKMARK [2][-]{subsection.1.13}{1.13 Justifications}{section.1}
+\BOOKMARK [3][-]{subsubsection.1.13.1}{1.13.1 The ragged2e package}{subsection.1.13}
+\BOOKMARK [2][-]{subsection.1.14}{1.14 Vertical spaces before and after captions}{section.1}
+\BOOKMARK [2][-]{subsection.1.15}{1.15 Positioning}{section.1}
+\BOOKMARK [2][-]{subsection.1.16}{1.16 Hooks}{section.1}
+\BOOKMARK [2][-]{subsection.1.17}{1.17 Lists}{section.1}
+\BOOKMARK [2][-]{subsection.1.18}{1.18 Debug option}{section.1}
+\BOOKMARK [2][-]{subsection.1.19}{1.19 Document classes \046 Babel support}{section.1}
+\BOOKMARK [3][-]{subsubsection.1.19.1}{1.19.1 The standard LaTeX classes}{subsection.1.19}
+\BOOKMARK [3][-]{subsubsection.1.19.2}{1.19.2 The AMS \046 SMF classes}{subsection.1.19}
+\BOOKMARK [3][-]{subsubsection.1.19.3}{1.19.3 The beamer class}{subsection.1.19}
+\BOOKMARK [3][-]{subsubsection.1.19.4}{1.19.4 The KOMA-Script classes}{subsection.1.19}
+\BOOKMARK [3][-]{subsubsection.1.19.5}{1.19.5 The NTG Dutch classes}{subsection.1.19}
+\BOOKMARK [3][-]{subsubsection.1.19.6}{1.19.6 The thesis class}{subsection.1.19}
+\BOOKMARK [3][-]{subsubsection.1.19.7}{1.19.7 The frenchb Babel option}{subsection.1.19}
+\BOOKMARK [3][-]{subsubsection.1.19.8}{1.19.8 The frenchle/pro package}{subsection.1.19}
+\BOOKMARK [2][-]{subsection.1.20}{1.20 Execution of options}{section.1}
+\BOOKMARK [2][-]{subsection.1.21}{1.21 Making an `List of' entry}{section.1}
+\BOOKMARK [2][-]{subsection.1.22}{1.22 Typesetting the caption}{section.1}
+\BOOKMARK [2][-]{subsection.1.23}{1.23 Types \046 sub-types}{section.1}
+\BOOKMARK [2][-]{subsection.1.24}{1.24 subfig package adaptions}{section.1}
+\BOOKMARK [1][-]{section.2}{2 Main package}{}
+\BOOKMARK [2][-]{subsection.2.1}{2.1 Identification}{section.2}
+\BOOKMARK [2][-]{subsection.2.2}{2.2 Loading the kernel}{section.2}
+\BOOKMARK [2][-]{subsection.2.3}{2.3 Check against incompatible document classes}{section.2}
+\BOOKMARK [2][-]{subsection.2.4}{2.4 Check against incompatible packages}{section.2}
+\BOOKMARK [2][-]{subsection.2.5}{2.5 Declaration of options}{section.2}
+\BOOKMARK [3][-]{subsubsection.2.5.1}{2.5.1 Options for figure and table}{subsection.2.5}
+\BOOKMARK [3][-]{subsubsection.2.5.2}{2.5.2 Miscellaneous options}{subsection.2.5}
+\BOOKMARK [3][-]{subsubsection.2.5.3}{2.5.3 caption v1.x compatibility options}{subsection.2.5}
+\BOOKMARK [3][-]{subsubsection.2.5.4}{2.5.4 caption2 v2.x compatibility options}{subsection.2.5}
+\BOOKMARK [3][-]{subsubsection.2.5.5}{2.5.5 Obsolete caption v3.0 options}{subsection.2.5}
+\BOOKMARK [3][-]{subsubsection.2.5.6}{2.5.6 fltpage package support options}{subsection.2.5}
+\BOOKMARK [3][-]{subsubsection.2.5.7}{2.5.7 hyperref package support options}{subsection.2.5}
+\BOOKMARK [2][-]{subsection.2.6}{2.6 AMS \046 SMF document classes support}{section.2}
+\BOOKMARK [2][-]{subsection.2.7}{2.7 KOMA-Script document classes support}{section.2}
+\BOOKMARK [2][-]{subsection.2.8}{2.8 Processing of options}{section.2}
+\BOOKMARK [2][-]{subsection.2.9}{2.9 \134captionof and \134captionlistentry}{section.2}
+\BOOKMARK [2][-]{subsection.2.10}{2.10 \134ContinuedFloat}{section.2}
+\BOOKMARK [2][-]{subsection.2.11}{2.11 Internal helpers}{section.2}
+\BOOKMARK [2][-]{subsection.2.12}{2.12 \134caption, \134@caption, and \134@makecaption}{section.2}
+\BOOKMARK [2][-]{subsection.2.13}{2.13 Support for sub-captions}{section.2}
+\BOOKMARK [2][-]{subsection.2.14}{2.14 Document class \046 Babel package support}{section.2}
+\BOOKMARK [3][-]{subsubsection.2.14.1}{2.14.1 The AMS \046 SMF classes}{subsection.2.14}
+\BOOKMARK [3][-]{subsubsection.2.14.2}{2.14.2 The beamer class}{subsection.2.14}
+\BOOKMARK [3][-]{subsubsection.2.14.3}{2.14.3 The KOMA-Script classes}{subsection.2.14}
+\BOOKMARK [3][-]{subsubsection.2.14.4}{2.14.4 The frenchb Babel option}{subsection.2.14}
+\BOOKMARK [3][-]{subsubsection.2.14.5}{2.14.5 The frenchle/pro package}{subsection.2.14}
+\BOOKMARK [2][-]{subsection.2.15}{2.15 Package support}{section.2}
+\BOOKMARK [3][-]{subsubsection.2.15.1}{2.15.1 The float package}{subsection.2.15}
+\BOOKMARK [3][-]{subsubsection.2.15.2}{2.15.2 The floatflt package}{subsection.2.15}
+\BOOKMARK [3][-]{subsubsection.2.15.3}{2.15.3 The fltpage package}{subsection.2.15}
+\BOOKMARK [3][-]{subsubsection.2.15.4}{2.15.4 The hyperref package}{subsection.2.15}
+\BOOKMARK [3][-]{subsubsection.2.15.5}{2.15.5 The hypcap package}{subsection.2.15}
+\BOOKMARK [3][-]{subsubsection.2.15.6}{2.15.6 The listings package}{subsection.2.15}
+\BOOKMARK [3][-]{subsubsection.2.15.7}{2.15.7 The longtable package}{subsection.2.15}
+\BOOKMARK [3][-]{subsubsection.2.15.8}{2.15.8 The picinpar package}{subsection.2.15}
+\BOOKMARK [3][-]{subsubsection.2.15.9}{2.15.9 The picins package}{subsection.2.15}
+\BOOKMARK [3][-]{subsubsection.2.15.10}{2.15.10 The rotating package}{subsection.2.15}
+\BOOKMARK [3][-]{subsubsection.2.15.11}{2.15.11 The sidecap package}{subsection.2.15}
+\BOOKMARK [3][-]{subsubsection.2.15.12}{2.15.12 The subfigure package}{subsection.2.15}
+\BOOKMARK [3][-]{subsubsection.2.15.13}{2.15.13 The supertabular and xtab packages}{subsection.2.15}
+\BOOKMARK [3][-]{subsubsection.2.15.14}{2.15.14 The threeparttable package}{subsection.2.15}
+\BOOKMARK [3][-]{subsubsection.2.15.15}{2.15.15 The wrapfig package}{subsection.2.15}
+\BOOKMARK [1][-]{bib2.1}{References}{}

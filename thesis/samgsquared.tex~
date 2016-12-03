@@ -1,0 +1,1390 @@
+%\newcommand{\case}[2]{\medskip\noindent \textbf{Case #1: }} 
+%\newcommand{\casee}[2]{\medskip\noindent \textbf{Case #1.#2: }} 
+ 
+\documentclass[12pt]{article} 
+ 
+ 
+\usepackage{amsfonts,amsthm,amssymb,amsmath} 
+\usepackage[pdftex]{graphicx} 
+\DeclareGraphicsRule{.pdftex}{pdf}{.pdftex}{} 
+\usepackage{setspace} 
+\usepackage{url}
+\usepackage{verbatim} 
+\usepackage{algorithmic} 
+\usepackage{algorithm} 
+\usepackage{fancyhdr} 
+\usepackage{mathtext} 
+\usepackage{mathrsfs} 
+\usepackage{amsfonts} 
+\pagestyle{fancy} 
+\lhead{Sam Bassett} 
+\rhead{\today} 
+
+\setlength{\headheight}{15pt}
+\setlength{\topmargin}{.25in} 
+\setlength{\leftmargin}{0.25in} 
+\setlength{\evensidemargin}{0.52in} 
+\setlength{\oddsidemargin}{0.52in}  
+\setlength{\textheight}{8.25in} 
+\setlength{\textwidth}{5.98in} 
+\setlength{\footskip}{.4in} 
+\setlength{\headwidth}{\textwidth}  
+ 
+%\title{blah blah} 
+\author{Samson Bassett} 
+ 
+\newcommand{\degr}{d} 
+\newtheorem{theorem}{Theorem}[section] 
+\newtheorem{lemma}[theorem]{Lemma} 
+\newtheorem{obs}[theorem]{Observation} 
+\newtheorem{proposition}[theorem]{Proposition} 
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{corollary}[theorem]{Corollary} 
+\newtheorem{procedure}[theorem]{procedure} 
+ 
+\begin{document} 
+ 
+\section{Introduction} 
+ 
+Performing an efficient exploration in unknown environments is a fundamental problem in several areas of mathematics.   
+We consider the problem of graph exploration, sometimes called graph traversal, in which a mobile agent has to visit 
+all $n$ nodes of an arbitrary graph $G$.  The mobile agent does not know the structure of the entire graph, it must 
+use some local information and a starting point in order to eventually visit every vertex of the graph.  
+It was shown in \cite{U} that a mobile agent performing a 
+random walk of length $O(n^3)$ will visit every vertex with high probability.  
+One important aspect of any deterministic solution is the amount of information available, which 
+includes both how much memory the agent has, and what information is stored locally on the graph.   
+If the agent 
+has at most constant memory, it is often modelled as a finite state automata.  The minimum local information 
+that every graph has is that every vertex knows which edges it is incident to.  
+In a graph with no additional local information available, limiting the agent to only constant memory is 
+not a trivial restriction.  A single mobile agent 
+cannot explore all graphs, in fact even a finite group of finite automata can not cooperatively 
+explore all cubic planar graphs \cite{R}.  This model was extended by Cook and Rackoff to a more powerful 
+tool called the Jumping Automaton for Graphs, or JAG, where any automaton in the team can jump to the location of any other.  
+However, even this 
+model is not powerful enough to explore all graphs, see \cite{CR}.  
+
+If we are allowed to store some extra information locally at each vertex of the graph, the results become more interesting.  
+For example, geometric graphs allow each vertex a unique identifier, which includes its geometric position 
+with respect to an embedding of the graph on a surface.  It turns out that planar geometric graphs can be explored with only a single 
+finite state automata with constant memory, see \cite{BM} and \cite{BKOO}.  These results were extended to a larger class 
+of graphs called quasi-planar graphs in \cite{CDKOSU}.  
+
+Another method of storing local information is to use port numbers, which were first proposed in \cite{DJSS}.  While leaving 
+vertices indistinguishible, each vertex assigns an ordering to all the edges incident to it.  This is sometimes 
+called a local orientation of the edges, and is usually represented by integers between $1$ and the degree of the vertex.  
+It was shown in 
+\cite{DJSS} that a single agent can use these port numbers to explore any graph in linear time, and furthermore this exploration 
+will traverse at most $10n$ edges.  Periodic graph exploration requires that an algorithm visits every vertex
+infinitely many times in a periodic manner, where the period is the maximum number of edge traversals 
+performed between two consecutive visits of a generic 
+vertex, denoted by $pi(n)$.  The problem of periodic graph traversal is concerned with finding upper and lower bounds 
+of $pi(n)$.  In \cite{I}, this upper bound of $\pi \le 10n$ 
+was improved to $\pi(n) \le 4n$, and then again in \cite{GKMNZ} to $\pi(n) < 3.75n-2$.  
+Here, we relax the definition of port numbers to allow integers so that they may be 
+larger than the degree of the vertex, and obtain a stronger 
+upper bound.  This problem has the trivial lower bound of $pi(n) \ge 2n-2$ as shown in \cite{}.  
+
+\section{Definitions and Notation}
+
+A finite simple graph $G$ is an ordered pair $G=(V,E)$, where $V$ is a finite 
+set of vertices, and $E$ is a finite set of edges such that each edge is a two element subset of $V$.  We 
+refer to finite simple graphs as just graphs.  By convention, we use $n$ for the number of vertices, and $m$ for the 
+number of edges of the graph.  For an edge $e=\{u,v\}$ we simply write $e=uv$, and say that $e$ is incident 
+to both $u$ and $v$.  The \emph{degree} of a vertex $v$, denoted $d(v)$, is the number of edges incident to $v$.  A $uv$-\emph{walk} 
+in a graph $G$ is an ordered sequence of vertices 
+$u=v_1, v_2, \ldots, v_{n-1}, v_k=v$, such that where $v_iv_{i+1}$ is an edge of $G$ for 
+all $1 \le i \le k-1$.  
+The vertices $u$ and $v$ are the \emph{terminal} vertices of a $uv$-walk, and 
+if they are understood, we simply refer to it as a walk.  
+The \emph{length} of a walk is the number of edges $v_iv_{i+1}$ in the sequence, and are referred to as edges of the walk.  
+A \emph{path} is a walk that does not allow 
+the repetition of vertices.   
+A \emph{cycle} $C$ of $G$ is a $uv$-walk such that $u=v$.  
+A cycle in $G$ that 
+contains every vertex of $G$ exactly once is called a \emph{Hamiltonian cycle}.  A \emph{Hamiltonian walk} is 
+a cycle in $G$ that 
+contains every vertex of $G$ at least once.
+
+
+
+The \emph{distance} between any two vertices $u$ and $v$ is the 
+length of a shortest $uv$-path.  
+The \emph{square} of a graph $G$, denoted $G^2$, 
+is constructed by starting  
+from $G$ by adding an edge between each pair of vertices at distance two.  Clearly, $G$ is a subgraph of $G^2$.  
+A \emph{mixed} graph $G$ is an ordered triple $G=(V,E,A)$, such that $(V,E)$ is a graph, and $A$ is a finite set of arcs, where 
+each arc is an ordered pair of vertices.  A mixed graph is called simple if $(V,E)$ is a simple graph, and for each arc $(u,v)$, 
+$uv\notin E$.  The \emph{underlying} graph is obtained by replacing every arc of a mixed graph by an edge 
+with the same endpoints.  A \emph{directed} graph is a mixed graph where 
+$E=\emptyset$.  For the arc $(u,v)$, we say that $u$ is the tail (vertex) of the arc, 
+and $v$ is the head (vertex) of the arc.  We say that $(u,v)$ is an arc from $u$ to $v$.  
+A \emph{directed} $uv$-\emph{path} $P$ is an ordered sequence of vertices 
+$u=v_1, v_2, \ldots, v_{n-1}, v_n=v$, without repetition, such that where $(v_iv_{i+1})$ is an arc for 
+all $1 \le i \le n-1$.  %We can define a directed cycle in a similar way.  
+If $uv$ is an edge of the graph $G=(V,E)$, we assign an orientation to 
+$uv$ by replacing $G$ with $(V,E\backslash \{uv\},\{(u,v)\})$, which is now a mixed graph.  Similarly we can assign 
+an orientation to any edge in a mixed graph.  If the orientation of an arc is not relevant, we sometimes refer to an arc $(u,v)$ as 
+the edge $uv$ of the underlying graph.    
+
+
+
+% add a paragraph for Finite state automata
+
+
+\section{Relay Vertices and Wedges}
+
+Let $G^2$ be the square of a graph $G$.  An edge $e$ of $G^2$ is called a \emph{real} edge if $e$ is 
+an edge of $G$, otherwise $e$ is a \emph{virtual} edge.  
+A path in $G^2$ that contains only real edges is a \emph{real path},  
+and similarly a path containing only virtual edges is a \emph{virtual path}. 
+ 
+
+It was shown by Fleischner in \cite{} that the square of any two connected graph is Hamiltonian, so 
+we will suppose that $G$ is two connected.  Suppose that $H$ is a Hamiltonian cycle of $G^2$ with the minimal number of virtual edges.  
+For our  
+purposes, we will place the vertices of $H$ on a circle in the order they appear on $H$.  Moreover, we will assume  
+a counterclockwise orientation of $H$, and assign the corresponding orientation to each edge of $H$ in $G^2$, so that 
+they are now also refered to as arcs, so $G^2$ is a mixed graph.  These arcs can be referred to as either arcs 
+of $G^2$ or arcs of $H$, and notice that 
+each vertex is incident with exactly two arcs.  %Arcs are a type of edge, so are either real arcs or virtual arcs.  
+
+ 
+ 
+\begin{obs}\label{obsx} If $(u,v)$ is any virtual arc, then there does not exist an arc $(x,y)$ such that $ux$ and $vy$ are 
+real edges. 
+\end{obs} 
+\begin{proof} Suppose there does exist such an arc $(x,y)$ of $H$ such that 
+$ux$ and $vy$ are real edges.  Let $P$ be the $vx$-path in $H$,  
+and let $Q$ be the $yu$-path in $H$.  We can now construct a Hamiltonian cycle $H'$ of $G^2$ by following $P$, then the edge $xu$,  
+then $Q$, and finally the edge $yv$.  See figure \ref{fig:forbid}.  Obviously $H'$ has at least one fewer virtual edge than $H$ has,  
+a contradiction. 
+\end{proof} 
+ 
+\begin{figure} 
+\centering 
+\resizebox{6cm}{!}{\includegraphics{forbid.pdf}} 
+\caption{The Hamiltonian cycle $H$ represented by a circle, and similarly $H'$ by a dotted line.\label{fig:forbid}} 
+\end{figure} 
+ 
+ 
+For each virtual arc $(u,v)$ we assign  
+a real path of length $2$ joining $u$ and $v$ which will be used by our labelling of ports.   
+This assigned path is called the \emph{relay path} of the arc $(u,v)$.   
+The fact that a relay path always exists follows from the definition of $G^2$.   
+The unique internal vertex of a relay path  
+is called the \emph{relay vertex} of the arc.  Note that more than one such real path may exist for  
+a virtual arc.  The relay paths can be chosen arbitrarily, it is only important that they are fixed.   
+The real edges of a relay path may or may not be arcs, a real edge  
+can be in more than one relay paths for different virtual arcs, and a vertex may be a relay vertex for more than one 
+virtual arc.   
+ 
+ 
+ 
+If $P$ is a maximal virtual path in $H$, containing at least one arc, where all virtual arcs share a common relay vertex $w$,  
+then the subgraph $W$ of $G^2$ consisting of $P$, the vertex $w$, and all real edges incident with both $w$ and some vertex of $P$ is  
+called a \emph{wedge}, see Figure \ref{fig:wedge} for an example.   
+ 
+ 
+Furthermore, we call $P$ the \emph{support} of the wedge, similarly an arc in $P$ is a \emph{support arc} of  
+the wedge, and vertices of $P$ are called \emph{support vertices} of the wedge.   
+The common relay vertex $w$ is referred to as the \emph{relay vertex of the wedge}.  A real edge in  
+$W$ is called a \emph{rib} of $W$.  If $P$ is a directed $uv$-path; we call $u$  
+the \emph{tail support vertex} of the wedge, and $v$ the \emph{head support vertex} of the wedge; these are both also  
+referred to as \emph{external vertices} of the wedge.  Internal vertices  
+of $P$ are called \emph{internal support vertices}, or simply \emph{internal vertices}, of the wedge.  The rib $uw$  
+is the \emph{left external rib} of $W$, and the rib  
+$wv$ the \emph{right external rib} of the $W$; they are both referred to as \emph{external ribs} of $W$.  Real  
+edges of $W$ that are not external ribs are \emph{internal ribs}.   The \emph{length} of a wedge $W$ is the number of  
+ribs of the wedge, denoted by $\ell(W)$. 
+See Figure \ref{fig:wedge} for an example of a wedge containing five ribs and four support arcs.  
+ 
+\begin{figure}[htp] 
+\centering 
+\resizebox{5cm}{!}{\includegraphics{wedge.pdf}}\\ 
+\caption{A wedge with four support arcs.  The ribs are real edges of $G^2$ and are represented in this figure  
+by thicker lines.  The support path consists of virtual edges of $G^2$ and are represented by regular lines.\label{fig:wedge}} 
+\end{figure} 
+ 
+%\begin{figure}[htp] 
+%\centering 
+%\includegraphics{erptsqfit} 
+%\caption{Transverse momentum distributions}\label{fig:erptsqfit} 
+%\end{figure} 
+ 
+If the right external rib of a wedge $W$ is also an arc, then $W$ is a \emph{right tied} wedge; similarly  
+if the left external rib is an arc then $W$ is a \emph{left tied} wedge.  Clearly, internal ribs of a wedge cannot be arcs;  
+if any edge $e$ is both a rib of $W$ and an arc of $G^2$, it must be an external rib of $W$.  Note that it is possible that a  
+wedge is both right tied and left tied, in which case it contains all the vertices of $G$.  A \emph{tied wedge}  
+is either right tied  
+or left tied.  A wedge that is not tied is called a \emph{free wedge}.   
+The following lemma characterizes how two wedges can interact. 
+ 
+\begin{lemma}\label{lemwedge} Suppose $W_1$ and $W_2$ are two distinct wedges.  Then \newline 
+$\mathbf{(a)}$  There is no arc $e$ that is a support arc of both $W_1$ and $W_2$.  \newline 
+$\mathbf{(b)}$  If $W_1$ and $W_2$ have the same relay vertex, they have no ribs in common.\newline   
+$\mathbf{(c)}$  If $e$ is an edge that is common to both $W_1$ and $W_2$, then $e$ is the  
+only edge they have in common.  Furthermore, $e$ is either the right external rib  
+of both wedges, or the left external rib of both wedges. 
+\end{lemma} 
+\begin{proof} Let $W_1$ and $W_2$ be two distinct wedges, with relay vertices $w_1,w_2$  and supports $P_1$,$P_2$, respectively.   
+To show $(a)$, suppose to the contrary that $e$ is a support arc of both $W_1$ and $W_2$.   
+Now $w_1$ is the relay vertex for $e$, since $e$ is a support arc for $W_1$.  But  
+$e$ is also a support arc of $W_2$, so $w_2$ is the relay vertex for $e$.  This forces $w_1 = w_2$.  Since we  
+supposed that $W_1 \ne W_2$, it must be that $P_1 \ne P_2$.  Since $e$ belongs to both $P_1$ and $P_2$, it must be the case that  
+either one of the paths is a subpath of the other, contradicting the maximality of the former; or $P_1$ and $P_2$ overlap, in  
+which case neither one is maximal, again a contradiction. 
+So the wedges have no support arcs in common. 
+ 
+ 
+Next, we prove $(b)$.  Suppose that $w_1 = w_2$.   Suppose a real edge $e$ is a rib of both  
+$W_1$ and $W_2$.  If $e$ is an internal  
+rib of either wedge, say $W_1$, then there is at least one support arc of $W_1$ contained in  
+$W_2$, which contradicts $(a)$.   
+Otherwise $e$ is an external rib of both wedges.  Suppose without loss of generality that  
+$e$ is the right external rib of $W_1$.  If $e$  
+is also the right external rib of $W_2$, then the wedges share at least one support arc,  
+which contradicts $(a)$.  If $e$ is the left  
+external rib of $W_2$, then the union of $P_1$ and $P_2$ is a longer path than both $P_1$ and $P_2$ alone, and all arcs  
+in the union are virtual and share the same relay vertex.  This contradicts the choice of $P_1$ and $P_2$, hence the  
+wedges have no ribs in common, so $(b)$ is proven. 
+ 
+For $(c)$, suppose that $e$ is an edge common to both wedges.  From $(a)$, $e$ is not a support arc, so it must be a rib of  
+both wedges.  Also, from $(b)$ we know that $w_1 \ne w_2$.  Since $e$ is a rib of both $W_1$ and  
+$W_2$, this forces $e=w_1w_2$.  So  
+$w_1$ is also a support vertex of $W_2$, and $w_2$ is also a support vertex of $W_1$; see Figure \ref{fig:wedgeflip}. 
+ 
+\begin{figure}[htp] 
+\centering 
+\resizebox{6cm}{!}{\includegraphics{wedgeflip.pdf}} 
+\caption{The edge $e$ is a rib of both wedges.\label{fig:wedgeflip}} 
+\end{figure} 
+%\includegraphics{wedgeflip.pdf} 
+ 
+Next we will show that $w_1$ is not an internal vertex of $W_2$, and $w_2$ is not an internal vertex of $W_1$.   
+Suppose without loss of generality  
+that $w_1$ is an internal vertex of $W_2$.  Let $f=(u,w_1)$ and $g=(w_1,v)$, which are the two support arcs of $W_2$ incident with $w_1$;  
+we know there are two such arcs since $w_1$ is internal.   
+There is at least one arc of $W_1$ incident with $w_2$, call it $h$.  Suppose that $h=(x,w_2)$.  The edge $xw_1$ is a real edge since  
+it is a rib of $W_1$, and $vw_2$ is a rib of $W_2$, which contradicts Observation \ref{obsx}.  If $h=(w_2,x)$ we get a similar  
+contradiction.  Since  
+all cases lead to contradiction,  
+$w_1$ is an external vertex of $W_2$, and similarly $w_2$ is an external vertex of $W_1$.  This forces $e$ to be an  
+external rib of both wedges.   
+ 
+Suppose without loss of generality that $e$ is the left external rib of $W_1$ and the right external  
+rib of $W_2$, see Figure \ref{fig:wedgecross}.  Let us suppose that $w_1$ is incident to a support arc $(w_1,x)$ of the wedge $W_2$, and  
+$w_2$ is incident to a support arc $(y,w_2)$ of the wedge $W_1$.  So $yw_1$ and $xw_2$ are real edges since they are ribs 
+of their respective wedges.  This condtradicts Observation \ref{obsx}, so $(c)$ is proved.   
+\end{proof} 
+ 
+\begin{figure}[htp] 
+\centering 
+\resizebox{6cm}{!}{\includegraphics{wedgecross.pdf}} 
+\caption{The edge $e$ is an external rib of both wedges.\label{fig:wedgecross}} 
+\end{figure} 
+%\includegraphics{wedgecross.pdf} 
+ 
+If a vertex $v$ is the relay vertex of $k$  
+wedges, we order these wedges at $v$ based on their occurrence along $H$.  
+The \emph{list of ordered wedges} $W_1,W_2,\ldots,W_k=\{W_i\}_{i=1}^k$ \emph{at} $v$  
+is the ordered list of all wedges with the common relay vertex $v$ such that for $W_i$ and $W_j$ with $i<j$, the support path of $W_i$  
+occurs before the support path of $W_j$ when following $H$ starting from $v$; see Figure \ref{fig:wedgeorder}.  This list 
+may be denoted by $\{W_i\}_i$ if $k$ is understood.  If $e$ is a  
+real edge incident with $v$, we say that $e$ is an \emph{isolated edge} of $v$ if $e$ is not a rib of any wedge in the list  
+of ordered wedges at $v$.  When the list of ordered  
+wedges is understood, we write $\ell_i$ for $\ell(W_i)$.   
+ 
+ 
+\begin{figure}[htp] 
+\centering 
+\resizebox{5cm}{!}{\includegraphics{wedgeorder.pdf}} 
+\caption{The list $W_1,W_2,\ldots,W_k$ is the list of ordered wedges at $v$.\label{fig:wedgeorder}} 
+\end{figure} 
+ 
+ 
+ 
+ 
+ 
+%define inc / outg 
+
+
+For each vertex $v$ of $G^2$, we specify two edges incident with $v$ in the following definition.  
+
+\begin{definition}\label{def:io}
+Let $(x,v)$ and $(v,y)$ be the two arcs incident with $v$.  The \emph{incoming edge} of $v$ is either the arc  
+$(x,v)$, if $(x,v)$ is a real arc, or the real edge $wv$, where $w$ is the relay vertex of $(x,v)$.  Similarly, the  
+\emph{outgoing edge} of $v$ is either the arc $(v,y)$, if $(v,y)$ is a real arc, or  
+the real edge $wv$, where $w$ is the relay vertex of $(v,y)$.  If the incoming edge of $v$ is equal to its outgoing edge, this  
+is called the \emph{backtrack edge} of $v$.   
+\end{definition}
+
+Note that the incoming and outgoing  
+edges of a vertex are always edges of $G$, and hence real edges of $G^2$.  By definition,  
+each vertex has exactly one incoming edge, one outgoing edge, and at most  
+one backtrack edge.  Since the relay vertices of all virtual arcs are fixed, the choice of incoming, outgoing, and backtrack  
+edges are fixed as well for every vertex of $G$.  In the next lemma, we characterize when a given real edge is a backtrack edge for  
+its incident vertex. 
+ 
+ 
+\begin{lemma}\label{lemmaback} 
+For any vertex $v$ and real edge $e$ incident to $v$, $e$ is a backtrack edge of $v$ if and only if  
+either $e$ is the internal rib of some wedge with relay vertex $w\ne v$;  
+or $e$ is both an arc of $H$ and an external rib of some tied wedge with relay vertex $w \ne v$, see Figure \ref{fig:wedgebkt}. 
+\end{lemma} 
+ 
+\begin{figure}[htp] 
+\centering 
+\resizebox{11cm}{!}{\includegraphics{wedgebkt.pdf}} 
+\caption{The two possible configurations for when $e$ is a backtrack edge of $v$. \newline  
+$a)$  The edge $e$ is an internal rib of $W$ with relay vertex $w\ne v$.  \newline  
+$b)$ The edge $e$ is the right external rib of $W$ with relay vertex $w\ne v$.\label{fig:wedgebkt}} 
+\end{figure} 
+ 
+\begin{proof} 
+Let $(x,v)$ and $(v,y)$ be the the two arcs of $H$ incident with $v$.  Let $e$ be an edge  
+incident to $v$. Suppose that $e$ is an internal rib of some wedge $W$ with relay vertex  
+$w\ne v$.  By the definition of a rib, $e=wv$ and $v$ is a support vertex of $W$.   
+Since $(x,v)$ and $(v,y)$ are both virtual  
+arcs incident to $v$ and $v$ is a support vertex of $W$, this means both $(x,v)$ and $(v,y)$ are  
+support arcs of $W$.  Let $w'$ be the relay vertex of $(x,v)$, where $w'$ is the relay vertex of the wedge $W'$.   
+This means that $(x,v)$ is a support arc of both $W$ and $W'$.  By Lemma \ref{lemwedge}, $W=W'$ and $w=w'$.  So $w$ is the  
+relay vertex of the arc $(x,v)$, and similarly $w$ is the relay vertex of $(y,v)$.  Since $(x,v)$ is a virtual arc with  
+relay vertex $w$, the incoming  
+edge of $v$ is $e$.  Similarly, $e$ is the outgoing edge of $v$.  Therefore $e$ is the backtrack edge of $v$.   
+ 
+ 
+Suppose that $e$ is both an arc of $H$ and an external rib of some tied wedge $W$ with relay vertex $w\ne v$.   
+Since $e$ is a rib of $W$, and $w\ne v$, then $v$ is a support vertex of $W$ and $e=wv$.   
+Let $(x,v)$ and $(v,y)$ be the arcs of $H$ incident to $v$.  Then, since $e$ is an arc of $H$ incident to $v$,  
+either $e=(x,v)$ or $e=(v,y)$.  Suppose without loss of generality  
+that $e=(x,v)$.  Since $e$ is a real arc, $e$ is the incoming edge of $v$.   
+Also, since $e$ is a rib of $W$, and $v$ is a support vertex of $W$, $(v,y)$ is a  
+support arc of $W$ and thus a virtual arc.  By Lemma \ref{lemwedge}, $w$ is the support vertex of $(v,y)$.  Now  
+$wv$ is the outgoing edge of $v$.  Since $e=wv$, $e$ is both the incoming edge and the outgoing edge of $v$, so  
+$e$ is a backtrack edge of $v$. 
+ 
+ 
+Now suppose that $e$ is a backtrack edge of $v$.  So $e$ is a real edge that is both the incoming and outgoing edge of $v$.   
+Let $(x,v)$ and $(v,y)$ be the arcs of $H$ incident to $v$.  Since $H$ has at least three vertices, $(x,v)\ne (v,y)$.  Suppose first that  
+$e$ is not an arc of $H$.  Since  
+$e$ is the incoming edge of $v$ and $e\ne (x,v)$, $e=vw_1$ where $w_1$ is the relay vertex of $(x,v)$.  Since  
+$e$ is the outgoing edge of $v$ and  $e\ne (v,y)$, $e=vw_2$ where $w_2$ is the relay vertex of $(x,v)$.  Thus $w_1=w_2$.   
+By Lemma \ref{lemwedge}, $(x,v)$ and $(v,y)$ are support arcs of some wedge $W$ with relay vertex $w=w_1=w_2$.   
+Since $e$ is a real edge incident to both $v$ and $w$, $e$ is a rib of $W$.  Since there are two support arcs of $W$ incident  
+with $v$, $e$ is an internal rib of $W$.  Now suppose $e$ is an arc of $H$.     
+Suppose without loss of generality that $e=(x,v)$.   
+Since $e$ is the incoming edge of $v$, $e$ is a real arc.   
+If we suppose that $(v,y)$ is a real edge, then $(v,y)$ is the outgoing edge of $v$, a contradiction since  
+$e\ne (v,y)$.  Let $w$ be the relay vertex of the virtal arc $(v,y)$.  Since $e$ is the outgoing edge of $v$, $e=vw$.   
+Since $e=(x,v)$, this forces $w=x$.  Let $W$ be the wedge with relay vertex $w$.  So $(v,y)$ is a support arc of $W$, and  
+$e$ is a rib of $W$.  Since $e$ is also an arc, $e$ is an external rib of $W$, and $W$ is a tied wedge. 
+\end{proof} 
+ 
+In the following we determine how, in some cases, incoming and outgoing edges of some vertex $v$ must look like.  It is  
+not difficult to observe that if $v$ is not a relay vertex or a support vertex of any wedge, then the incoming and outgoing edges of  
+$v$ are real arcs of $H$ which enter and leave $v$, respectively.  Similarly, if $v$ is an internal support vertex, then its incoming  
+and outgoing edges are identical and constitute the backtrack edge of $v$.  Moreover, if $v$ is an  
+external support vertex of exactly one wedge, then one of the two will be the external rib incident to $v$,  
+and the other will be the real arc of $H$ incident to $v$.  If $v$ is the external support vertex of two distinct wedges, then  
+the incoming and outgoing edges will be the two external ribs of these wedges incident to $v$.  The following lemma will determine  
+how these edges occur in the case when $v$ is identical to some relay vertex $w$.   
+ 
+ 
+\begin{lemma}\label{lemmaext} 
+Let $W$ be a wedge with relay vertex $w$.  Let $e$ be the 
+incoming edge of $w$, and $f$ be the outgoing edge of $w$, and $e\ne f$.   
+If $e$ is a rib of $W$, then $e$ is the right external 
+rib of $W$.  If $f$ is a rib of $W$, then $f$ is the left external rib of $W$.     
+\end{lemma} 
+\begin{proof} 
+Let $e$ be a rib of $W$, say $e=vw$ where $v$ is a support vertex of $W$.   
+Suppose first that $e$ is an arc, so $e$ is an external rib  
+of the tied wedge $W$.  Since $e$ is the incoming edge of $v$, and $e$ is an arc, we must have  
+$e=(v,w)$.  So by definition, $W$ is a right tied wedge, and  
+$e$ is the right external rib of $W$.  Now suppose that $e$ is not an arc.  Let $(x,w)$ be an arc  
+of $H$ incident with $w$.  Since $e\ne (x,w)$, and $e$ is the incoming edge of $w$,  
+$v$ is the relay vertex of the arc $(x,w)$.  So $vx$ is a real edge.   
+Let $(v,y)$ be an arc of $H$ incident with $v$.  Since $e$ is a real edge,  
+by Observation \ref{obsx} there is no real edge joining $y$ and $w$.  Therefore $(v,y)$ is not a support arc of $W$, and  
+hence $e$ is the right external rib of $W$.  The argument for $f$ is symmetric.   
+
+Suppose that $f$ is an arc, so $f$ is an external rib  
+of the tied wedge $W$.  Since $e$ is the incoming edge of $v$, and $e$ is an arc, we must have  
+$f=(w,v)$.  So by definition, $W$ is a left tied wedge, and  
+$f$ is the left external rib of $W$.  Now suppose that $f$ is not an arc of $H$.  Let $(w,x)$ be an arc  
+of $H$ incident with $w$.  Since $f\ne (w,x)$, and $f$ is the incoming edge of $w$,  
+$v$ is the relay vertex of the arc $(w,x)$.  So $vx$ is a real edge.   
+Let $(y,v)$ be an arc of $H$ incident with $v$.  Since $f$ is a real edge,  
+by Observation \ref{obsx} there is no real edge joining $y$ and $w$.  Therefore $(y,v)$ is not a support arc of $W$, and  
+hence $f$ is the left external rib of $W$. 
+ 
+\end{proof} 
+ 
+
+The next section describes how to assign port numbers to the graph, and how the robot will traverse the graph using 
+these port numbers.
+
+\section{Port Numbers}
+
+Let $e=uv$ be an edge of $G$.  In this section, we assign two numbers (port numbers) to $e$, one port at each end vertex.  The  
+two port numbers for a given edge may be different. 
+We say that a vertex $v$ \emph{sees} port number $p$, or $p$ is \emph{seen} at $v$, if there  
+is some edge $e$ incident to $v$ such that the port of $e$ at $v$ is $p$.  Otherwise $v$ does not see  
+the port number $p$, and we say that $p$ is \emph{unseen} at $v$.  
+During during each step of the traversal, the robot will always visit exactly one current vertex.   
+To \emph{leave} a vertex $u$ on port number $p$, the will traverse the edge $e=uv$ such that $e$ at $u$ has the  
+port number $p$.   
+The robot moves to the vertex $v$ and this vertex becomes the current vertex of the next step.  We also say that the robot \emph{entered}  
+$v$ on the port $q$ if $q$ is the port number of $e$ at $v$.   
+If the current vertex $u$ and the edge $e=uv$ are understood, we simply say that the robot will leave on $p$, or enter on $q$.   
+ 
+
+
+All port numbers for every  
+vertex $v$ are chosen uniquely from the set $\{ 1 , 2 , 3 , \ldots , 2\degr(v) \}$. 
+When comparing two port numbers, we use  
+the natural ordering of integers.   
+ 
+
+%\section{Port Numbering Procedures}
+
+%... definition of problem!!!!!!!!!!!!!!!!!!
+
+
+ 
+ 
+ 
+We now describe how to assign an interval of port numbers to several edges of a wedge.   
+Given any wedge $W$ of width $k$ with relay vertex $w$  
+and support $P$, where $P$ vertices $u=u_1,u_2,u_3,\ldots,u_k=v$ in order, we will 
+assign the interval $[p,q]$ by assigning integers between $p$ and $q$ to ribs of $W$ at $w$.  This is only 
+possible if the length of the interval equals the length of the wedge, meaning $k=q-p+1$.  
+
+\begin{figure}[htp] 
+\centering 
+\resizebox{7cm}{!}{\includegraphics{basiclabels.pdf}} 
+\caption{The first image is a wedge showing a few internal ribs; the second image shows port numbering notation.\label{fig:basiclabels}} 
+\end{figure} 
+
+We assign $[p,q]$ to the wedge $W$ for $p<q \le 2\degr(w)$, by  
+assigning port number $p+i-1$ to the edge $wu_i$ at $w$, for $1\le i\le k$.   
+This is depicted in our figures with labels $p$ and $q$ on the  
+external edges of $W$ joined by a dotted line, see figure \ref{fig:basiclabels}.  We assign $[p,1]$ to $W$ for $p>1$ 
+by assignung port number $p+i-1$ to the edge $wu_i$ at $w$ for $1\le i < k$, and then port number $1$ to $wu_k$ at $w$.  
+We assign $[p,q]\cup \{r\}$ for $r<p<q < 2d(w)$ and $k=q-p+2$ by assigning port number $p+i-1$ to $wu_i$ at $w$, and 
+then port number $r$ to $wu_k$ at $w$.    
+Furthermore, we assign an interval of labels $[p,q]$ to a series of wedges  
+$W_1,W_2,\ldots,W_{j}$ by breaking $[p,q]$ into $j$ disjoint subintervals, and assigning $[p,p+\ell_1-1]$ to $W_1$, 
+$[p+\ell_1,p+\ell_1+\ell_2-1]$ to $W_2$, and so on.  Recall that $\ell(W_i)=\ell_i$.  
+Notice that assigning port numbers to a wedge in this way only assigns port numbers  
+at the relay vertex of the wedge, not at any of the support vertices. 
+ 
+ 
+ 
+%\begin{figure}[htp] 
+%\centering 
+%\resizebox{7cm}{!}{\includegraphics{basiclabels.pdf}} 
+%\caption{The first image is a wedge showing a few internal ribs; the second image shows port numbering notation.\label{fig:basiclabels}} 
+%\end{figure} 
+%\includegraph 
+%\includegraphics{basiclabels.pdf} 
+ 
+ 
+%\newpage % this is temporary
+
+ Next we describe the traversal rules that the robot will follow, after port numbers have been  
+assigned.  The robot will be programmed such that Rule 0 is only applied if $v$ is the initial vertex, otherwise it 
+will apply one of the other three rules.  Then the applicable rule instructs the robot on how to move to a new current vertex in the 
+next step. 
+ 
+\begin{itemize} 
+\item \textbf{Rule 0}:  If $v$ sees port $1$, leave on $2$.  If $1$ is unseen at $v$ and $2\degr(v)$ is seen at $v$, leave on $2\degr(v)$.  
+If both $1$ and $2d(v)$ are unseen at $v$, leave on $2\degr(v)-1$.   
+\item \textbf{Rule 1}: If $v$ was entered on $p$ for $1 \le p \le 2\degr(v)-2$, and $p$ is not the largest
+port number seen at $v$, leave $v$ on port $q$ such that 
+$q$ the smallest port number larger than $p$ that is seen at $v$.  
+If $p$ is the largest port number seen at $v$, leave 
+on $1$.
+%\item Enter on $2d(v)-1$ and $2d(v)$ is used, leave on $2d(v)$ 
+\item \textbf{Rule 2}: If $v$ was entered on $2\degr(v)-1$ and $v$ sees $2\degr(v)$, leave $v$ on $2\degr(v)$.  
+If $v$ was entered on $2d(v)-1$ and $2\degr(v)$ is unseen at $v$, leave $v$ on port number $q<2d(v)$ such  
+that $q-1$ is the largest unseen port number at $v$.
+%\item Enter on $2d(v)$ and $1$ is used, leave on $1$ 
+\item \textbf{Rule 3}: If $v$ was entered on $2\degr(v)$ and $v$ sees port $1$, then leave on $1$.  If port $1$ is unseen, leave $v$ on 
+$2\degr(v)$.
+\end{itemize} 
+
+ 
+The assignment of the port numbers will be accomplished by applying the procedure destailed below to 
+each vertex of $G$.  
+
+
+
+ 
+ 
+\begin{center}\begin{tabular*}{\textwidth}{c}\hline\end{tabular*}\end{center}
+\noindent \textbf{procedure Port-Numbering}(vertex $v$)
+%\begin{center}\begin{tabular*}{0.5\textwidth}{c}\hline\end{tabular*}\end{center}
+\begin{algorithmic}[1] 
+ 
+
+\STATE{Let $a$ be the incoming edge of $v$} %\label{line:t1}
+\STATE{Let $b$ be the outgoing edge of $v$}%\label{line:t2}
+\STATE{Let $k$ be the number such that $v$ is a relay vertex of $k$ distinct wedges} %\label{line:t3}
+\IF{ $k > 0$} %\label{line:t4}
+\STATE{Let $\{W_i\}_{i=1}^k$ be the list of ordered wedges at $v$}% \label{line:t5}
+\ENDIF %\label{line:t6}
+\IF{$a=b$} \label{line:sr1}
+\STATE{Assign $2d(v)$ to $a$ at $v$} \label{line:backtrack}
+\IF{$k>0$}
+\STATE{Assign $[2,\sum_{i=1}^k\ell_i+1]$ to $\{W_i\}_{i=1}^k$}\label{line:fill0} \COMMENT{\emph{ Figures \ref{fig:26}, \ref{fig:36}, \ref{fig:46}  }}
+\ENDIF
+\ENDIF
+\IF{$a\ne b$ and both $a$ and $b$ are isolated edges of $v$}\label{line:sr2}
+%\STATE (Figures \ref{fig:11}, \ref{fig:21}, \ref{fig:31}, \ref{fig:41})
+\STATE{Assign $1$ to $a$ at $v$}\label{line:iso1}
+\STATE{Assign $2$ to $b$ at $v$} \label{line:iso2}\COMMENT{\emph{ Figures \ref{fig:11}, \ref{fig:21}, \ref{fig:31}, \ref{fig:41}  }}
+\IF{$k>0$}
+\STATE{Assign $[3,\sum_{i=1}^k\ell_i+2]$ to $\{W_i\}_{i=1}^k$}\label{line:fill1}
+\ENDIF
+\ENDIF
+
+ 
+
+\IF{$a\ne b$ and both $a$ and $b$ are not isolated edges of $v$}\label{line:sr3}
+\IF{$W_1$ is both right tied and left tied}
+ %Figure \ref{fig:15})
+     \STATE{Assign $[1,\ell_1]$ to $W_1$} \label{line:bothtied} \COMMENT{\emph{  Figure \ref{fig:15} }}
+ \ELSE
+   \STATE{Pick $j$ such that $a$ is a rib of $W_j$}
+   \STATE{Pick $j'$ such that $b$ is a rib of $W_{j'}$}
+   \IF{$j=j'$}
+      \IF{$W_j$ is either left tied or right tied}
+           % Figures \ref{fig:25}, \ref{fig:35}
+  \STATE{Assign $[2\degr(v)-\ell_j , 2\degr(v)-1]$ to $W_j$} \label{line:sametied} \COMMENT{\emph{  Figures \ref{fig:25}, \ref{fig:35}  }}
+    \ENDIF
+\IF{$W_j$ is a free wedge}
+      % so W_p not tied wedge
+        % Figures \ref{fig:45}
+       \STATE{Assign $[2\degr(v)-\ell_j+1,2\degr(v)-1]\cup \{ 2 \degr(v) - \ell_j\}$ to $W_j$} \label{line:samefree} \COMMENT{\emph{  Figure \ref{fig:45} }}
+    \ENDIF % matches wp free
+
+    \IF{$k \ge 2$}
+      \STATE{Assign $[2,\sum_{i\ne j}\ell_i+1]$ to $\{W_i\}_{i\ne j}$ }\label{line:fill2}
+    \ENDIF % matches k 2
+
+  \ENDIF
+ \IF{$j\ne j'$} %label p and q seperately, then do the rest if any
+
+%    Figures \ref{fig:14}, \ref{fig:24}, \ref{fig:34}, \ref{fig:44}
+    \STATE{Assign  $[2,\ell_{j'}+1]$ to $W_{j'}$}\label{line:bothout} \COMMENT{\emph{  Figures \ref{fig:14}, \ref{fig:24}, \ref{fig:34}, \ref{fig:44} }}
+
+    \STATE{Assign $[2\degr(v)-\ell_{j} +2 , 1]$ to $W_{j}$}\label{line:bothin}
+
+
+    \IF{$k \ge 3$}
+      \STATE{Assign $[ \ell_{j'}+2 ,\sum_{i\ne j, i\ne j'}\ell_i+1]$ to $\{W_i\}_{i\ne j, i\ne j'}$ }\label{line:fill3}
+    \ENDIF
+
+  \ENDIF % matches p=q
+
+
+
+\ENDIF % matches W1 double tied
+
+\ENDIF %end of case
+
+\IF{$a\ne b$, $a$ is an isolated edge of $v$ but $b$ is not}\label{line:sr4}
+\STATE{Assign $1$ to $a$ at $v$}\label{line:only1}
+\STATE{Pick $j$ such that $b$ is a rib of $W_j$}
+%Figures \ref{fig:13}, \ref{fig:23}, \ref{fig:33}, \ref{fig:43}
+
+  \STATE{Assign $[2,\ell_j+1]$ to $W_j$}\label{line:outtied} \COMMENT{\emph{  Figures \ref{fig:13}, \ref{fig:23}, \ref{fig:33}, \ref{fig:43} }}
+
+
+\IF{$k \ge 2$}
+  \STATE{Assign $[\ell_j+2,\sum_{i\ne j}\ell_i+1]$ to $\{W_i\}_{i\ne j}$}\label{line:fill4}
+\ENDIF
+
+\ENDIF
+\IF{$a\ne b$, $b$ is an isolated edge of $v$ but $a$ is not}\label{line:sr5}
+\STATE{Assign $2$ to $b$ at $v$}\label{line:only2}
+\STATE{Pick $j$ such that $a$ is a rib of $W_j$}
+%\STATE (Figures \ref{fig:12}, \ref{fig:22}, \ref{fig:32}, \ref{fig:42})
+\STATE{Assign $[2\degr(v)-\ell_j+2,1]$ to $W_j$}\label{line:intied} \COMMENT{\emph{  Figures \ref{fig:12}, \ref{fig:22}, \ref{fig:32}, \ref{fig:42}  }}
+
+\IF{$k \ge 2$}
+  \STATE{Assign $[\ell_j+2,\sum_{i\ne j}\ell_i+1]$ to $\{W_i\}_{i\ne j}$}\label{line:fill5}
+\ENDIF
+ 
+
+
+
+ 
+\ENDIF % matches final case
+ 
+ 
+\end{algorithmic} 
+\begin{center}\begin{tabular*}{\textwidth}{c}\hline\end{tabular*}\end{center}
+
+
+
+By the construction of this procedure, and from our interval notation, it is clear that assigned ports will be unique at each vertex.  
+It is apparent that the Port-Numbering procedure assigns ports to a vertex in one of five subroutines (starting at lines 
+\ref{line:sr1}, \ref{line:sr2}, \ref{line:sr3}, \ref{line:sr4}, and \ref{line:sr5}) based on structural conditions 
+of $G^2$ and the chosen Hamiltonian cycle.  We will be referring to these subroutines by line number on which they begin.  It is clear 
+that no vertex will enter more than one of these five subroutines.  
+By the construction of these subroutines, 
+and from our interval notation, it is clear 
+that assigned ports will be unique at each vertex.  The only subroutine that could potentially assign 
+two different port numbers to the same place is at line \ref{line:sr1}.  But this 
+cannot happen, since Lemma \ref{lemmaback} guarantees that any backtrack edge of a vertex $v$ will also be an isolated edge of $v$.
+
+
+
+Based on the Port-Numbering procedure, the following two lemmas show that all the traversal rules are well defined.
+
+\begin{lemma}\label{lemmazero}
+Every vertex $v$ sees at least one of the ports $1$, $2d(v)-1$ or $2d(v)$.  If $v$ sees port $1$, $v$ also sees port $2$.
+\end{lemma}
+\begin{proof}
+Let $v$ be any vertex, $a$ 
+be the incoming edge of $v$, and $b$ be the outgoing edge of $v$.    
+If $a=b$, then the subroutine at line \ref{line:sr1} assigned port numbers to $v$, and $v$ sees port 
+$2d(v)$ by 
+line \ref{line:backtrack}.  Moreover, port $1$ is not assigned to $v$ in this subroutine.  
+Otherwise $a\ne b$.  Suppose that 
+$a$ is an isolated edge of $v$.  If $b$ is also an isolated edge of $v$, then the subroutine 
+at line \ref{line:sr2} assigned ports to $v$.  So $v$ sees port $1$ by line \ref{line:iso1} and 
+port $2$ by line \ref{line:iso2}.  
+If $b$ is not an isolated edge of $v$, then the subroutine on line \ref{line:sr4} assigned ports to $v$.  
+So $v$ sees port $1$ by line \ref{line:only1} and port $2$ to \ref{line:outtied}.  
+
+Now suppose that $a$ is not an isolated edge of $v$.  If $b$ is an isolated edge of $v$, then the subroutine 
+from line \ref{line:sr5} assigned ports to $v$.  So $v$ sees port $1$ by line \ref{line:intied} and port $2$ by line \ref{line:only2}.  
+If $b$ is not an isolated edge of $v$, then the subroutine  on line \ref{line:sr3} assigned ports to $v$.  Suppose that $v$ 
+is the relay vertex of $k$ distinct wedges.  Since there is at least one edge of $v$ that is not isolated, $k\ge 1$.  
+Let $W_1,W_2,\ldots,W_k$ 
+be the list of ordered wedges at $v$.  If there is a wedge with relay vertex $v$ that is both right tied and left tied, then this 
+wedge is $W_1$ and $k=1$.  By line \ref{line:bothtied} $v$ sees both ports $1$ and $2$.  Otherwise suppose there 
+is no such wedge.  Since $a$ is not an isolated edge of $v$, it is a rib.  Suppose $a$ is a rib of $W_j$.  Similarly 
+suppose $b$ is a rib of $W_{j'}$, where $1\le j,j' \le k$.  If $j=j'$, 
+then either by line \ref{line:sametied} or \ref{line:samefree} (depending on whether or not $W_j$ is a tied wedge), port 
+$2d-1$ is seen at $v$.  Moreover, port $1$ is not assigned to $v$ on these two lines.  
+If $j\ne j'$, then $v$ sees port $1$ by line \ref{line:bothin} and port $2$ by line \ref{line:bothout}.  This 
+concludes all cases, and thus the proof.
+\end{proof}
+
+This ensures that Rule 0 and Rule 1 are well defined.  Notice that Rule 3 is well defined wherever it is applicable by definition.  
+The following lemma shows that Rule 2 is well defined.  
+
+\begin{lemma}\label{lemmaunseen}
+At every vertex $v$, there is a port less than $2d(v)$ that is unseen at $v$.  
+\end{lemma}
+\begin{proof}
+Let $v$ be any vertex of $G$.  Since $G$ is two connected, $d(v) \ge 2$ and therefore $2d(v) \ge 4$.  Recall that 
+only edges of $G$ are assigned port numbers, so $v$ will see at most $d(v)$ ports.  
+Let $S$ be the set of port numbers seen at $v$.  Since $2d(v)-1 \ge 3$,  we have $2d(v)-1 > d(v)$, 
+so by the pidgeonhole principle there is at least 
+one port $p$ in $[1,2d(v)-1]$ that is not in the set $S$.  Therefore $p<2d(v)$ and $p$ is unseen at $v$.  
+\end{proof}
+
+%Now all of the traversal rules are well defined on a graph with our port numbers.  
+We know now that the four traversal rules are well defined, so we will assume in proofs that whenever a rule is used, the 
+corresponding ports are seen.  
+Next we define an invariant which will guarantee, under certain conditions, that the robot will start periodically traversing $G$. 
+Let $H^*$ be the graph constructed by starting from $H$, then for every virtual arc $(u,v)$ of $H$ with relay vertex $w$, add 
+the real edges (with the new orientation) $(u,w)$ and $(w,v)$ to $H^*$, and 
+delete the virtual arc $(u,v)$ from $H^*$.  Naturally, $H^*$ induces a (directed) Hamiltonian walk of $G$ by 
+following $H$, where each virtual arc is traversed via the corresponding relay path.  For 
+convenience, and to futher distinguish from arcs of $H$, we refer to arcs of $H^*$ as simply edges of $H^*$. It is clear that the 
+underlying graph of $H^*$ contains only real edges of $G^2$, so $H^*$ can be treated as subgraph of $G$.  We will abuse 
+notation and identify the directed graph $H^*$ with this Hamiltonian walk of $G$, denote both by $H^*$.  In this context, 
+we can say that an (undirected) edge and an arc (directed edge) are equal if their end vertices are equal, so we identify edges 
+of $H^*$ with their corresponding edges in $G$.  If we 
+refer to the port number of an edge of $H^*$, this of course means the appropriate port number in $G$, since port numbers are only assigned 
+in $G$ and not in $H^*$.  This means, for 
+example, that both $(v,u)$ and $(u,v)$ will always have the same port number at $v$, even though $v$ only sees this 
+port number once in $G$.  
+It is also important to notice that if $e=uv$ is in the relay path of some virtual arc of 
+$H$, it is possible (but not neccesarily the case) that both $(u,v)$ and $(v,u)$ are in $H^*$.    
+
+From the definition of $H^*$, we can make several simple observations.  If $e=uv$ is the incoming edge of $v$, and $vw$ is the 
+outgoing edge of $v$, then $(u,v)$ and $(v,w)$ are in $H^*$.  If $W$ is a wedge, and $wx$ is any internal rib of $W$, then 
+both $(w,x)$ and $(x,w)$ are in $H^*$.  If $uw$ is the left external rib of the wedge $W$, and $vw$ is the right 
+external rib of $W$, then $(u,w)$ and $(w,v)$ are in $H^*$.  
+
+Naturally, $H^*$ induces a (directed) Hamiltonian walk of $G$ by 
+following $H$, where each virtual arc of $H$ is traversed via the corresponding relay path in $G$.  
+This gives rise to the natural successor function defined 
+on edges of $H^*$; the \emph{successor} of an edge of $e$ in $H^*$ is the edge following $e$ on $H^*$, denoted by $e^+$.  To 
+leave a vertex $v$ on an edge of $H^*$, there is a unique edge of $H^*$ for which $v$ is its tail.  Clearly if 
+$e=(u,v)$, then $e^+ = (v,w)$ for some vertex $w$.  With this in mind, we define an invariant which will 
+guarantee, under certain conditions, that the robot will start periodically traversing $G$. 
+%First we observe some basic properties of this successor function.  
+
+
+%Next we define an invariant which will guarantee that under certain conditions the robot will start periodically traversing $G$. 
+
+\noindent \textbf{The Invariant:} \emph{If the robot enters a new current vertex on an edge $e$ in $H^*$, 
+then the robot will leave on the edge $e^+$ in $H^*$.  }
+
+It is not difficult to see that the invariant guarantees a periodic traversal once a robot uses an edge of $H^*$ to enter a vertex.  Before 
+we prove that the invariant always holds, we first prove that starting from any initial vertex, the robot always 
+leaves the vertex on an edge of $H^*$.  
+
+%The following lemma also proves some additional conditions about the edge traversed at this initial step.
+
+
+\begin{lemma}\label{lemmastart}
+Let $v$ be the initial vertex.  Then the robot will leave $v$ on an edge $e=(v,u)$ in $H^*$.
+\end{lemma}
+\begin{proof}  
+
+Suppose that the robot starts at $v$, and leaves $v$ on the edge $e=(v,u)$.   It is sufficient 
+to show that either $e$ is the outgoing edge of $v$, or $e$ is the right external rib or an internal rib of some wedge.  
+Let $a$ be the incoming edge of $v$, $b$ be the 
+outgoing edge of $v$, and suppose that $v$ is the relay vertex of $k$ distinct wedges.  
+Let $p$ be the port of $e$ at $v$.  The only rule that applies to $v$ is Rule 0 (since $v$ is the initial vertex).  
+There are three cases: $p$ is either 
+$2$, $2d(v)-1$, or $2d(v)$.  
+
+\noindent\textbf{Case 1: } Suppose first that $p=2$.  
+Since $G$ is two connected, $d(v) \ge 2$, so $2d(v)-1 \ge 3 > 2$, and by Rule 0, port $1$ is seen at $v$.   
+If $a=b$, then the subroutine on line \ref{line:sr1} was used to assign ports to $v$.  %But this subroutine does %not assign port $1$.  
+Since $2d(v)\ne 1$, port $1$ is not assigned by either line \ref{line:fill0} or \ref{line:backtrack}.  
+This is a contradiction, so $a\ne b$.
+
+Suppose that $b$ is an 
+isolated edge of $v$. 
+So one of the subroutines on line \ref{line:sr2} or \ref{line:sr5} was used at $v$.  
+Both assign port $2$ to $b$ at $v$.  So 
+$e=b$, which is an edge of $H^*$.  
+
+Now suppose $b$ is not an isolated edge of $v$.  
+Suppose further that $a$ is an isolated edge of $v$.  So the subroutine at line \ref{line:sr4} was executed at $v$.  Since 
+$b$ is not an isolated edge of $v$, there exists a wedge $W$ with relay vertex $v$ such that $b$ is a rib of 
+$W$.  By Lemma \ref{lemwedge}, $b$ 
+is the left external rib of $W$.  The line \ref{line:outtied} assigned 
+port $2$ the left external rib of $W$.  So $e=b$, which is an edge of $H^*$.  
+Now suppose $a$ is not an isolated edge of $v$, so the subroutine at line \ref{line:sr3} was executed at $v$.  Since $a$ and 
+$b$ are not isolated edges of $v$, this implies there is at least one wedge with relay vertex $v$, so $k>0$.  
+Let $W_1,W_2,\ldots,W_k$ be the list of ordered wedges at $v$.  
+Suppose that 
+one of these wedges, say $W_j$, is both 
+right tied and left tied.  This implies that $W_j$ contains all the vertices of $G$, we see that $k=j=1$.  
+Line \ref{line:bothtied} assigned 
+the interval $[1,\ell_1]$ to $W_1$.  Since $\ell_1 \ge 2$, 
+the edge $e$ is either an internal rib or the right external rib of $W_1$.  
+Thus $e$ is an edge of $H^*$.  
+Otherwise there is no wedge that is both right tied and left tied.  
+Since $a$ and $b$ are not isolated edges of $v$, $a$ is a rib of $W_j$ and $b$ is a rib of $W_{j'}$, 
+for some $1 \le j,j' \le k$.  By Lemma \ref{lemwedge}, 
+$a$ is the right external rib of $W_j$, and $b$ is the left external rib of $W_{j'}$.  
+Suppose that $j\ne j'$, so line \ref{line:bothout} assigned port $2$ to the $b$, and $e=b$ which is an edge of $H^*$.  
+Now suppose $j=j'$.  In this case, we show that port $1$ is not assigned at $v$, which is a contradiction.  
+Indeed, no edge of $W_j$ is assigned port $1$ at $v$ (by lines \ref{line:sametied} and \ref{line:samefree}) because the 
+smallest such port number is $2d(v)-\ell_j$.  And since $2\le \ell_j \le d(v)$, we have $2d(v)-\ell_j \ge d(v) > 1$.  Moreover, 
+edges of all remaining wedges with relay vertex $v$ are assigned ports no smaller than $2$ by line \ref{line:fill2}.  This 
+is a contradiction.
+
+\begin{figure}[htp] 
+\centering 
+\resizebox{4.5cm}{!}{\includegraphics{athbr.pdf}} 
+\caption{The incoming edge of $v$ is an isolated edge; 
+the outgoing edge of $v$ is an arc and an external rib of a right tied wedge\label{fig:athbr}} 
+\end{figure}
+
+
+\noindent\textbf{Case 2: } Suppose next that $p=2d(v)-1$.  
+Since Rule 0 was used, and $2d(v)-1 > 2$, ports $1$ and $2d(v)$ are both unseen at $v$.  
+If $a=b$, we obtain a contradiction since port $2d(v)$ is seen at $v$ because of line \ref{line:backtrack}.  
+So $a\ne b$.  
+
+Suppose $b$ is an isolated edge of $v$.  If we suppose further 
+that $a$ is also an isolated edge, then the subroutine at line \ref{line:sr2} assigned ports to $v$.  But now port $1$ was 
+assigned to $v$ on line \ref{line:iso1}, contradicting our assumption.  
+Suppose now 
+that $a$ is not an isolated edge of $v$, so the subroutine at line \ref{line:sr5} assigned ports to $v$.  But now port $1$ was 
+assigned to $v$ on line \ref{line:intied}, a contradiction.  
+
+Now suppose that $b$ is not an isolated edge of $v$.  If $a$ is an isolated edge of $v$, then the subroutine at line \ref{line:sr4} 
+assigned port $1$ to $v$, a contradiction.  So $a$ is also not an isolated edge of $v$, %which implies $k>0$, 
+and that the subroutine 
+at line \ref{line:sr3} assigned ports to $v$.  Moreover, $k>0$.  If 
+there is a wedge $W$ with relay vertex $v$ that is both left tied and right tied, then by line \ref{line:bothtied}, 
+$v$ would see port $1$, a contradiction.  Thus there is no such wedge.  Let $W_1,W_2,\ldots,W_k$ be 
+the list of ordered wedges at $v$.  
+Since $a$ and $b$ are not isolated edges of $v$, $a$ is a rib of $W_j$ and $b$ is a rib of $W_{j'}$, 
+for some $1 \le j,j' \le k$.  By Lemma \ref{lemwedge}, 
+$a$ is the right external rib of $W_j$, and $b$ is the left external rib of $W_{j'}$.  
+Suppose $j=j'$.  If $W_j$ is either left tied or right tied, then by line \ref{line:sametied}, $e$ is the right external rib of $W_j$ and 
+thus an edge of $H^*$.  If $W_j$ is a free wedge, then by line \ref{line:samefree}, and since 
+$p=2d(v)-1$, $e$ is an internal rib of $W_j$ and 
+thus an edge of $H^*$.  If $j\ne j'$, then by line \ref{line:bothin}, port $1$ is seen at $v$, a contradiction.  
+
+
+
+\noindent\textbf{Case 3: } Finally, suppose $p=2d(v)$.  So port $1$ is unseen at $v$ by Rule 0.  
+Much of the arguments here are similar to case $2$, since we again 
+obtain a contradiction if port $1$ was assigned at $v$.  
+If $a=b$, then port $2d(v)$ was assigned to $b$ in the subroutine at line \ref{line:sr1}, so $e=b$ which is an edge of $H^*$.  
+So now $a\ne b$.  All of the following subcases lead to a contradiction.  %Several 
+%of the arguments here are similar to case $2$, by showing port $1$ was assigned at $v$. 
+
+
+Suppose that $b$ is an isolated edge of $v$.  If $a$ is also an isolated edge of $v$, 
+the subroutine at line \ref{line:sr2} assigned ports to $v$.  But now port $1$ was 
+assigned to $v$ on line \ref{line:iso1}, contradicting our assumption.  
+Suppose now that $a$ is not an isolated edge of $v$, so the subroutine on line \ref{line:sr5} was used at $v$.  
+Now port $1$ was 
+assigned to $v$ on line \ref{line:intied}, contradicting our assumption.  
+
+Now suppose that $b$ is not an isolated edge of $v$.  If $a$ is an isolated edge of $v$, the 
+the subroutine on line \ref{line:sr4} was executed at $v$.  This is a contradiction since port $1$ is assigned 
+to $v$ at line \ref{line:only1}.  
+Now suppose $a$ is not an isolated edge of $v$.   So $k>0$ and the subroutine at line \ref{line:sr3} was 
+used at $v$.  Suppose that there is a wedge $W$ with relay vertex $v$ that is both right tied and left tied.  Then by 
+line \ref{line:bothtied}, port $1$ is seen at $v$, a contradiction.  So there is no such wedge.  Let $W_1,W_2,\ldots,W_k$ be 
+the list of ordered wedges at $v$.  Let $a$ be a rib of $W_j$ and $b$ a rib of $W_{j'}$, for some $1 \le j,j' \le k$.  
+By Lemma \ref{lemwedge}, 
+$a$ is the right external rib of $W_j$, and $b$ is the left external rib of $W_{j'}$.  Suppose $j=j'$.  
+All cases are handled the same; we can see by 
+lines \ref{line:sametied}, \ref{line:samefree}, and \ref{line:fill2} that the maximum port number assigned to $v$ 
+is $2d(v)-1$.  This follows since $\sum_i \ell_i +1 \le d(v) +1 < 2d(v)$.  This is a contradiction, since $p=2d(v)$. 
+So now suppose $j\ne j'$.  By \ref{line:bothin}, port $1$ is seen at $v$ a contradiction.  
+  
+
+Thus in all cases, the robot will leave $v$ on an edge $e$ of $H^*$.  
+
+\end{proof}
+
+Now we know that the robot enters the second vertex along an edge in $H^*$, so we next need to show that the invariant 
+holds for any vertex.  To this end, we first, we prove one supporting lemma that will be used in the proof of the invariant.
+
+%Suppose the robot leaves vertex $v$ on the edge $f=vu$.  If $f$ is the left external rib of $W$ with relay vertex $v$, then 
+%$f$ is the outgoing edge of $v$.  If $f$ is the right external rib of $W$ with relay vertex $u$, then $e$ is the incoming edge of $u$.
+%need induction, and we know already this did not occur on the initial step by \ref{lemmastart}
+
+
+\begin{lemma}\label{lemmabad}
+If the robot enters vertex $v$ on the edge $e=(u,v)$, and $e$ is the right external rib of some wedge $W$ with relay vertex $v$, then 
+$e$ is the incoming edge of $v$.  
+\end{lemma}
+\begin{proof}
+Recall that since $e$ is an edge of $H^*$, there are three cases: either $e$ is also a real arc of $H$, or $v$ 
+is the relay vertex for some virtual arc $(u,x)$ of $H$, or $u$ is the relay vertex for some virtual arc 
+$(x,v)$ of $H$. 
+%Suppose the robot enters vertex $v$ on the edge $e=(u,v)$, and $e$ is the right external rib of the wedge $W$ with relay vertex $v$.
+
+Let $P$ be the support path of $W$.  
+First, suppose that $e$ is a real arc of $H$.  Then by Definition \ref{def:io}, $e$ is the incoming 
+edge of $v$.  Next suppose $u$ is the relay vertex for some virtual arc $(x,v)$ of $H$.  This again implies by 
+Definition \ref{def:io} that $e$ is the incoming edge of $v$.   Finally, suppose that $v$ 
+is the relay vertex for some virtual arc $(u,x)$ of $H$.  So $P+(u,x)$ is a virtual path, which contradicts the maximality of $P$.  
+\end{proof}
+
+The following lemma proves that the invariant holds.  
+
+\begin{lemma}\label{lemmainvariant}
+Let $v$ be the current vertex of the robot, and suppose 
+the robot enters a $v$ along the edge $e$ of $H^*$.  Then 
+the robot will leave $v$ on $e^+$.
+\end{lemma}
+\begin{proof}
+
+%First, observe that if $e$ at $v$ has port number $p$ and $2 < p < 2d(v)$, then $p$ was assigned during the Port-Numbering 
+%procedure, and $e$ is a rib of some wedge with relay vertex $v$.  
+
+Suppose $e=(u,v)$ has port number $p$ at $v$.  %In this proof, we examine all the possible values 
+%that $p$ can take on in each case.  
+Let $a$ be the incoming edge of $v$, $b$ the outgoing edge of $v$, and $v$ 
+be the relay vertex of $k$ wedges.  
+
+
+%Recall that since $e$ is an edge of $H^*$, there are three cases: either $e$ is a real arc of $H$, $v$ 
+%is the relay vertex for some virtual arc $(u,x)$ of $H$, or $u$ is the relay vertex for some virtual arc $(x,v)$ of $H$.  In 
+%these cases we call $e$ a real edge, a left relay edge, or a right relay edge, repectively.  
+
+
+%These cases will be important for arriving at contradictions in several parts of the proof.
+
+Suppose first that $a=b$, then the subroutine on line \ref{line:sr1} was executed to assign port numbers to $v$.  
+If $p=2d(v)$, then $e=a=e^+$ by line \ref{line:backtrack} (except that $e^+$ has the opposite direction of $e$ in $H^*$ of course).  
+%(which by our abuse of notation means that $a=uv$).  
+Port $1$ is unseen at $v$ since $2d(v)\ne 1$ and by line \ref{line:fill0}.
+Now by Rule 3, the robot will leave $v$ on $e^+$.  %So the robot will leave $v$ on $e^+$.  
+So now $p< 2d(v)$.  %This implies, from line \ref{line:fill0}, that 
+Since $e$ is neither the incoming nor outgoing edge of $v$, $e$ is a rib of some wedge with relay 
+vertex $v$, (by the definition of $H^*$).  Since this implies $k>0$ we let $W_1,W_2,\ldots,W_k$ be the list of ordered wedges at 
+$v$.  %So by line \ref{line:fill0}, $2\le p\le \sum_i \ell_i +1$.  
+So $e$ is a rib of some wedge in this list, say $W_j$.  By line \ref{line:fill0}, $2\le p\le \sum_i \ell_i +1$.  
+Since $e\ne a$ we know by Lemma \ref{lemmabad} that $e$ is not 
+the right external rib of $W_j$.  This implies $p\ne \sum_i \ell_i +1$, and that there is a support arc $(u,x)$ of $W_j$ for some vertex 
+$x$ such that $e^+=(v,x)$.  Clearly, the edge $vx$ was assigned port $p+1$ at $v$.  
+Since $p< \sum_i \ell_i+1 \le d(v) \le 2d(v)-1$, we have $p\le 2d(v)-2$, so by Rule 1 the robot 
+will leave $v$ on $e^+$.  From now on suppose $a\ne b$.  
+  
+
+
+Suppose that $b$ is an isolated edge of $v$.  So either the subroutine on line \ref{line:sr2} or line \ref{line:sr5}.  
+If $p=2$, then $e=b$ by either line \ref{line:iso2} or \ref{line:only2}; 
+we will show that this leads 
+to a contradiction.  To this end, first recall that since $e$ is an edge of $H^*$, 
+there are three cases: either $e$ is a real arc of $H$, $v$ 
+is the relay vertex for some virtual arc $(u,x)$ of $H$, or $u$ is the relay vertex for some virtual arc $(x,v)$ of $H$, 
+or $e$ is a real arc of $H$.  In 
+these cases we call $e$ a a left relay edge, a right relay edge, or a real edge, repectively.  
+%Since $b$ is the outgoing edge of $v$, we have two cases by Definition \ref{def:io}.  
+If $e$ is a left relay edge then $e$ is not an isolated edge of $v$.  This is a contradiction since $e=b$ 
+and $e$ is an isolated edge of $v$.  
+%%Since $b$ is an isolated edge of $v$, it is not a rib of some tied wedge with relay vertex $v$.  If $e$ not an isolated 
+%edge of $u$, then $e$ is a right relay edge.  This implies $e$ is the right external rib of some tied wedge $W$ with relay vertex 
+%$u$, a contradiction since $e$ is not the incoming edge of $v$.  
+If $e$ is a right relay edge then $e$ is the incoming edge of $v$.  This 
+is a contradiction since $e=b \ne a$.  Therefore, $p\ne 2$.  Finally suppose $e$ is a real edge, so 
+$e$ is a real arc of $H$ (and $e$ must follow the same 
+counterclockwise orientation as the arcs of $H$).  But since $b$ has the orientation 
+$(v,u)$ in $H$, and $e=(u,v)$, it follows that $uv$ is the only edge in $G$.  This implies $a=b$, a contradiction.  
+Therefore, $p\ne 2$.  
+
+Now suppose $a$ is an isolated edge, so the subroutine on line \ref{line:sr2} assigned ports to $v$.  
+If $p=1$, then $e=a$ by line \ref{line:iso1}, which implies $e^+=b$.  
+Since $b$ has port $2$ at $v$ by line \ref{line:iso2}, the robot will leave $v$ on $e^+$ by Rule 1.  
+Now let $p>2$.  Since $a$ and $b$ have ports $1$ and $2$ at $v$, respectively, 
+$e\ne a$ and $e\ne b$.  This 
+implies that $e$ is a rib of some wedge with relay vertex $v$, so $k>0$.  %and $p \le \sum_i \ell_1 +2$.  
+Let $W_1,W_2,\ldots,W_k$ be 
+the list of ordered wedges at $v$.  So $e$ is a rib of some wedge in this list, say $W_t$. 
+Since $e$ is not the outgoing edge of 
+$v$, by Lemma \ref{lemmabad} $e$ is an internal or the left external rib of $W_t$.  
+So $e^+ = (v,x)$ where $(u,x)$ is a 
+support arc of $W_t$.   
+Since $e$ (in particular) is not the right external rib of $W_k$, we know by by line \ref{line:fill1} that, $p < \sum_i \ell_i +2$ and 
+$e^+$ has port $p+1$ at $v$.  Since $v$ has at least two distinct isolated edges, $\sum_i \ell_i \le d(v)-2$, so 
+Since $p < \sum_i \ell_i +2 \le d(v) +2-2 = d(v) \le 2d(v)-2$, the robot will leave $v$ on $e^+$ by Rule 1.  
+
+Now suppose that $a$ is not an isolated edge of $v$.  Since $b$ is an isolated edge of $v$ 
+(by our above supposition) the subroutine on line \ref{line:sr5} was used at $v$.  
+Since $a$ is not an isolated edge of $v$, $k>0$, so let $W_1,W_2,\ldots,W_k$ be the list of ordered wedges at $v$.  By 
+Lemma \ref{lemmaext}, $a$ is the right external rib of some wedge in this list, say $W_j$.  And by line \ref{line:intied}, $a$ has 
+port $1$ at $v$.  So if $p=1$, then $e=a$ 
+by line \ref{line:intied}, which 
+implies $e^+ =b$.  Since $e^+$ has port $2$ at $v$, by Rule 1 the robot will leave $v$ on $e^+$.  
+Let $p>2$.  Now, since $a$ and $b$ have ports $1$ and $2$ at $v$, respectively, 
+$e\ne a$ and $e\ne b$.  This implies $e$ is a rib 
+of some wedge with relay vertex $v$, say $W_{t}$.  
+If $j=t$, then by line \ref{line:intied} 
+$2d(v)-\ell_j \le p \le 2d(v)$.  Furthermore, $e^+ = (v,x)$ is  
+a rib of $W_j$ such that $(u,x)$ is a support arc of $W_j$.  If $p=2d(v)$, then $e^+$ has port $1$ at $v$, so by Rule 3, the robot 
+will leave $v$ on $e^+$.  If $p=2d(v)-1$, then $e^+$ has port $p+1=2d(v)$ at $v$, and the robot will leave $v$ on $e^+$ by Rule 2.  
+If $2d(v)-\ell_j \le p \le 2d(v)-2$, then $e^+$ has port $p+1$ and the robot will leave $v$ on $e^+$ by Rule 1.  
+Now suppose $t\ne j$.  Since $e\ne a$, we know 
+by Lemma \ref{lemmabad} that $e$ is either an internal rib or the right external rib of $W_{t}$.  
+So $\ell_j+2 \le p < \sum_{i\ne j} \ell_i +1$ by line \ref{line:fill5}, and $e^+=(v,x)$ 
+such that $(u,x)$ is a support arc of $W_{t}$.  This implies $e^+$ has port $p+1$ at $v$.  Since 
+$p < \sum_i \ell_i +1 \le d(v)+1 \le  2d(v)-1$, it follows that $p \le 2d(v)-2$, so the robot will leave $v$ on $e^+$ by Rule 1.  
+
+Next, we suppose that $b$ is not an isolated edge of $v$, which implies $k>0$.  Let $W_1,W_2,\ldots, W_k$ be 
+the list of ordered wedges at $v$.  Suppose further that $a$ is an isolated edge of $v$, so 
+the subroutine at line \ref{line:sr4} assigned port numbers to $v$.  Since $b$ is not an isolated edge of $v$, $b$ is a rib 
+of some wedge with relay vertex $v$, say $W_j$.  By Lemma \ref{lemmaext}, $b$ is the left external rib of $W_j$.  
+If $p=1$, then $e=a$, which implies 
+$e^+ = b$.  By line \ref{line:outtied}, $e^+$ has port $2$ at $v$, so by Rule 1, the robot will leave $v$ on $e^+$.  
+Otherwise $p>1$, so $e\ne a$ and $e$ is not an isolated 
+edge of $v$.  Hence $e$ is a rib of some wedge with relay vertex $v$, say $W_{t}$.  %By either line \ref{line:outtied} 
+%or \ref{line:fill4} (depending on whether or not $t=j$), $2\le p\le \sum_{i\ne j} \ell_i +1 < 2d(v)-2$.  
+Since $e\ne a$, $e$ is either the left external or an internal 
+rib of $W_{t}$ by Lemma \ref{lemmabad}.  In either case, $e^+=(v,x)$ 
+such that $(u,x)$ is a support arc of $W_{t}$.  This implies $e^+$ has port $p+1$ at $v$.  By either line \ref{line:outtied} 
+or \ref{line:fill4} (depending on whether or not $t=j$), $2\le p\le \sum_{i\ne j} \ell_i +1$.  
+Since $e$ is (in particular) not the right external rib of $W_k$, $p < \sum_{i} \ell_i +1 \le d(v)+1  \le  2d(v)-1$.  So by Rule 1 
+the robot will leave $v$ on $e^+$.
+  
+Finally, suppose that $a$ is not an isolated edge of $v$, which implies (since we supposed 
+$b$ is not an isolated edge of $v$ above) that the subroutine on line \ref{line:sr3} was used at $v$.  
+Since both $a$ and $b$ are not isolated edges of $v$, $a$ is a rib of $W_j$ and $b$ is a rib of $W_{j'}$ for some 
+$1\le j,j' \le k$.  By Lemma \ref{lemmaext}, $a$ is the 
+right external rib of $W_j$ and $b$ is the right external rib of $W_{j'}$.  
+If there is a wedge with relay vertex $v$ that is both left tied and right tied, it must be $W_1$ (since 
+it contains all vertices of $G$).  This also implies that $k=j=j'=1$.  By line \ref{line:bothtied}, $b$ has port $1$ at $v$, and $a$ 
+has port $\ell_1$ at $v$.  If $p=\ell_1$, then $e=a$, which implies $e^+=b$.  Since $W_1$ contains all 
+vertices of $G$, $\ell_1$ is the largest port number seen at $v$.  Since we also have $\ell_1 \le d(v) \le 2d(v)-2$, 
+the robot will leave $v$ on $e^+$ by Rule 1.  Otherwise $1\le p < \ell_1$, which implies $e^+=(v,x)$ is a rib of $W_1$ 
+such that $(u,x)$ is a support arc of $W_1$.  So $e^+$ has port $p+1$ at $v$, and the robot will leave $v$ on $e^+$ by Rule 1.  
+Now suppose there is no such wedge.  
+%If we suppose that $e$ is a rib of some wedge other than $W_j$ or $W_{j'}$, then clearly $k\ge 2$
+Suppose that $j=j'$.
+If we suppose that $e$ is a rib of some wedge other than $W_j$, say $W_t$, then clearly $k\ge 2$.  So 
+$2\le p\le \sum_{i\ne j} \ell_i +1$ by line \ref{line:fill2}.  By Lemma \ref{lemmabad}, since $e$ is not the incoming edge of 
+$v$, $e$ is not the right external rib of $W_t$.  So $e^+=(v,x)$ 
+such that $(u,x)$ is a support arc of $W_{t}$.  This implies $e^+$ has port $p+1$ at $v$.  So by Rule 1, the robot 
+will leave $v$ on $e^+$.  Now let $e$ be a rib of $W_j$.  
+If $W_j$ is a left tied or a right tied wedge, then 
+by line \ref{line:sametied}, $b$ has port $2d(v)-\ell_j$ at $v$, and $a$ has port $2d(v)-1$ at $v$.  Suppose $p=2d(v)-1$.  
+So $e=a$ and $e^+=b$.  
+%Notice that ports $1$ and $2d(v)$ are unseen at $v$.  
+Let $q =2d(v)-\ell_j$.  Clearly $q-1$ is unseen at $v$ if $k<2$, 
+so it is the largest unseen port at $v$.  So by Rule 2, the robot will leave $v$ on $e^+$.  Suppose $k\ge 2$, so 
+the port $\sum_{i\ne j} \ell_i +1$ is the largest port seen at $v$ outside of $W_j$.  But notice 
+that $d(v) < 2d(v) - \ell_j$ holds for any $j$ as long as $k>1$, so 
+$\sum_{i\ne j} \ell_i +1 \le d(v)-2 +1 = d(v)-1 < 2d(v)-\ell_j -1 = q-1$.  So $q-1$ is the largest unseen port 
+at $v$, and $2d(v)$ is unseen at $v$, thus the robot will leave $v$ on $e^+$ by Rule 2.  
+Now $p< 2d(v)-1$.  Since $e$ is not the right external rib of $W_j$ by Lemma \ref{lemmabad}, port 
+$p+1$ was assigned to $e^+$ which is also a rib of $W_j$.  So the robot will leave $v$ on $e^+$ by Rule 1.  
+Now suppose $W_j$ is a free wedge.  By line \ref{line:samefree}, $a$ has port $2d(v)-\ell_j$ at $v$ 
+and $b$ has port $2d(v)-\ell_j+1$ at $v$.  If $p = 2d(v)-\ell_j$, then $e=a$.  So $e^+=b$, which has port $2d(v)-\ell_j+1 = p+1$ at 
+$v$.  By Rule 1, and since $p\le 2d(v)-2$, the robot leaves $v$ on $e^+$.  Let $p=2d(v)-1$ and $q=2d(v)-\ell_j$.  So $e$ is 
+the (specific) internal rib of $W_j$ such that $(u,x)$ is a support arc of $W_j$ and $a=vx$.  This means $e^+ = a$, which has 
+port $q$ at $v$.  By the same argument as above (in the case where $W_j$ was not a free wedge), 
+$q-1$ is the largest unseen port at $v$, so the robot will leave $v$ 
+on $e^+$.  Now let $2d(v)-\ell_j < p \le 2d(v)-2$.  Since $e$ is not the right external rib of $W_j$, and by 
+a similar argument to what we have seen several times above, the robot will leave $v$ on $e^+$.  
+
+
+Finally, suppose $j\ne j'$.  
+So $a$ has port $1$ at $v$, and $b$ has port $2$ at $v$, by 
+lines \ref{line:bothin} and \ref{line:bothout} respectively.  
+If $e$ is a rib of some wedge other than $W_j$ and $W_{j'}$, say $W_t$, then clearly $k\ge 3$.  
+So $\ell_{j'}+2 \le p \le \sum_{i\ne j, i\ne j'} \ell_i+1$ by line \ref{line:fill3}.  As above, $e$ cannot be the right external rib of $W_t$, 
+and the robot will leave $v$ on $e^+$ by the same reasoning.  Suppose first that $e$ is 
+a rib of $W_{j}$.  
+If $p=1$ then $e=a$ which implies $e^+=b$.  Since $e^+$ has port $2$ at $v$, the robot will leave $v$ on $e^+$ by Rule 1.  
+If $p=2d(v)$,  then $e$ is the (specific) internal rib of $W_{j}$ such that $(u,x)$ is a support arc of $W_j$ and $a=vx$.  So 
+$e^+=(v,x)$ which has port $1$ at $v$.  So by Rule 3 the robot will leave $v$ on $e^+$.  Similarly, we get the same 
+result if $2d(v)-\ell_j+2 \le p\le 2d(v)-1$.  Now, if $e$ is a rib of $W_{j'}$, then $2\le p\le \ell_j+1$.  
+Since $e$ is not the incoming edge of $v$, Lemma \ref{lemmabad} means $e$ is not the right external rib of $W_{j'}$.  
+By the same argument as above, the robot will leave $v$ on $e^+$.  
+
+
+
+
+ 
+
+
+
+
+
+
+\end{proof}
+
+%In the next section, we will show that a graph with these port numbers, when followed with our 
+%traversal rules, will visit 
+%every vertex periodically.  We also obtain an upper bound on the period of this traversal.  
+ 
+...
+
+\newpage % this is temporary
+
+\section{Results}
+ 
+...
+
+
+\begin{theorem}
+Let $G$ be a graph, and $H$ be a Hamiltonian cycle of $G^2$ with the minimal number of virtual edges.  
+If the ports of $G$ are labelled with the Port-Numbering procedure, then a 
+robot programmed with the four traversal rules will perform a periodic traversal of $G$ with period $\pi(n) \le 2n-2$.
+\end{theorem} 
+\begin{proof} 
+ 
+
+We know from Lemma \ref{lemmainvariant} that the invariant holds.  So the robot visits every vertex of $G$ by 
+traversing the Hamiltonian cycle $H$ of $G^2$.  Recall that the period $\pi(n)$ of the traversal 
+is the maximum number of edge traversals between two consecutive visits of any vertex.  
+For any arc $e=(u,v)$ of $H$, the robot will traverse at most two edges to get from $u$ to $v$; one if $e$ 
+is real and two if $e$ is virtual.  The maximum number of edge traversals between two visits of $v$ will clearly occur 
+when $v$ traverses the entire cycle $H$ after leaving $v$.  Suppose that $H$ has $i$ virtual arcs, and $j$ real arcs, 
+where necessarily $i+j=n$.  Thus the number of edges of $G$ traversed is $2i+j$.  
+
+Next we claim that $H$ always has at 
+least two real arcs.  Suppose to the contrary that $H$ has only virtual arcs, and let $e=(u,v)$ be any 
+virtual arc of $H$.  Let $w$ be the relay vertex for $e$; by definition $w\ne u$ and $w\ne v$.  Construct 
+$H'$ by first removing $e$ and then adding the edges $wu$ and $wv$, so clearly $H'$ is a Hamiltonian cycle 
+of $G$.  Since $H$ was chosen to have the minimal number of virtual arcs, and $H'$ has two fewer virtual arcs, we 
+have a contradiction.  
+
+So to maximize the number of edges traversed $2i+j$, we maximize $i$ by setting $i=n-2$, and $j=2$, to obtain 
+$\pi(n)\le 2(n-2)+2 = 2n-2$.  
+
+ 
+\end{proof} 
+
+... 
+
+\newpage 
+ 
+\section{References}
+
+
+
+%get all from sirocco2009, plus my own, plus all the ones for embedding chapter 1
+%in correct format first time around
+
+%then do introduction
+
+
+\begin{thebibliography}{9}
+
+\bibitem{AH} S. Albers, M.R. Henzinger.  Exploring unknown environments.  \emph{SIAM J. Computing} \textbf{29} (2000) 1164--1188.
+
+\bibitem{ABRS} B. Awerbuch, M. Betke, R. Rivest, M. Sing.  Piecemeal graph exploration by 
+a mobile robot.  \emph{Information and Computation} \textbf{152}(2) (1999) 155--172.  
+
+\bibitem{BS} M. Bender, D.K. Slonim.  The power of team exploration: two robots can learn unlabeled directed graphs.  
+\emph{35th Annual Symposium on Foundations of Computer Science (FOCS)}.  (1994) 75--85.
+
+\bibitem{BFRSV} M. Bender, A. Fernandez, D. Ron, A. Sahai, S. Vadhan.  The power of a pebble: 
+Exploring and mapping directed graphs.  \emph{Information and Computation} \textbf{176}(1) (2002) 1--21.
+
+\bibitem{BM} P. Bose, P. Morin.  An improved algorithm for subdivision traversal without extra storage.  \emph{Internat. J. Comput. Geom. Appl.} 
+\textbf{12}(4) 297--308 (2002)
+
+\bibitem{BRS} A. Blum, P. Raghavan, B. Schieber.  Navigating in unfamiliar geometric terrain.  \emph{SIAM 
+Journal on Computing}, \textbf{26} (1997) 110-137.
+
+\bibitem{B} L. Budach.  Automata and labyrinths.  \emph{Mathematische Nachrichten} (1978) 195--282.
+
+\bibitem{CDKOSU} E. Ch\'{a}vez, S. Dobrev, E. Kranakis, J. Opatrny, L. Stacho, J. Urrutia. 
+Traversal of a quasi-planar subdivision without using mark bits.  \emph{Journal of Interconnection Networks} \textbf{5}(4) (2004).
+
+\bibitem{CR} S. Cook, C. Rackoff.  Space lower bounds for maze threadability on restricted machines.  \emph{SIAM J. Computing} 
+\textbf{9}(3)(1980) 636--652.  
+
+\bibitem{CFIKP} R. Cohen, P. Fraigniaud, D. Ilcinkas, A. Korman, D. Peleg.  Label-guided graph exploration 
+by a finite automaton.  \emph{ACM Transactions on Algorithms} \textbf{4}(4) (2008) 331--344.
+
+\bibitem{BKOO} M. de Berg, M. van Kreveld, R. van Oostrum, M. Overmars.  Simple traversal of a subdivision 
+without extra storage.  \emph{International Journal of Geogrpahic Information Systems},  \textbf{11} 349--373, (1997).
+
+\bibitem{DKP} X. Deng, T. Kameda, C.H. Papadimitriou.  How to learn an unknown environment: The rectilinear case.  \emph{Journal 
+of the ACM}, \textbf{45} (1998) 215--245.
+
+%\bibitem{}H. Rollik, Automaten in planaren graphen.  Acta Informatica \textbf{13} (1980) 287--298.  
+\bibitem{DP} X. Deng, C.H. Papadimitriou.  Exploring an unknown graph.  \emph{J. Graph Theory}  \textbf{32}(3) (1999) 265--297.
+
+\bibitem{DJSS} S. Dobrev, J. Jansson, K. Sadakane, W.K. Sung.  Finding short 
+right-hand-on-the-wall walks in graphs.  \emph{Proc. 12th Colloquium on Structural Information and 
+Communication Complexity (SIROCCO)}.  Volume LNCS 3499. (2005) 127--139.  
+
+\bibitem{FT} R. Fleischer, G. Trippen.  Exploring an unknown graph efficiently.  \emph{Proc. 13th Annual 
+European Symposium on Algorithms (ESA)}.  (2005) 11--22.
+
+\bibitem{FIPPP} P. Fraigniaud, D. Ilcinkas, G. Peer, A. Pelc, D. Peleg.  Graph exploration by a finite automaton.  \emph{Theoretical 
+Computer Science} \textbf{345}(2-3) (2005) 331-344.  
+
+\bibitem{GKMNZ} L. G\c{a}sieniec, R. Klasing, R. Martin, A. Navarra, X. Zhang.  Fast 
+periodic graph exploration with constant memory.  \emph{J Computer and System Science}, \textbf{74}(5) (2008) 
+808--822.  
+
+%\bibitem{} M. Bender, A. Fernandez, D. Ron, A. Sahai, S. Vadhan.  The power of a pebble: 
+%Exploring and mapping directed graphs.  \emph{Information and Computation} \textbf{176}(1) (2002) 1--21.
+
+%\bibitem{}S. Albers, M.R. Henzinger.  Exploring unknown environments.  \emph{SIAM J. Computing} \textbf{29} (2000) 1164--1188.
+
+%\bibitem{} M. Bender, D.K. Slonim.  The power of team exploration: two robots can learn unlabeled directed graphs.  
+%\emph{35th Annual Symposium on Foundations of Computer Science (FOCS)}.  (1994) 75--85.
+
+%\bibitem{} X. Deng, C.H. Papadimitriou.  Exploring an unknown graph.  \emph{J. Graph Theory}  \textbf{32}(3) (1999) 265--297.
+
+
+
+\bibitem{I} D. Ilcinkas.  Setting port numbers for fast graph exploration.  \emph{Theoretical Computer Science} \textbf{401} (2008) 236--242.  
+
+
+\bibitem{R} H. Rollik, Automaten in planaren graphen.  Acta Informatica \textbf{13} (1980) 287--298.  
+
+\bibitem{RHSI} N. Roo, S. Hareti, W. Shi, S. Iyengar.  Robot navigation in unknown terrains: Introductory survey 
+of length, non-heuristic algorithms.  \emph{Techincal Report ORNL/TM12410} Oak Ridge National Lab (1993).  
+
+\bibitem{U} U. Friege.  A tight upper bound on the cover time for random walks on graphs.  \emph{Random Structures and Algorithms}, 
+\textbf{6}(1) 51--54 (1995).
+
+%\begin{thebibliography}{9}
+
+%CONFERENCEARTICLE:
+%\bibitem{Erdos01} P. Erd\H os, \emph{A selection of problems and
+%results in combinatorics}, Recent trends in combinatorics (Matrahaza,
+%1995), Cambridge Univ. Press, Cambridge, 2001, pp. 1--6.%%
+
+%BOOK:
+%\bibitem{ConcreteMath}
+%R.L. Graham, D.E. Knuth, and O. Patashnik, \emph{Concrete
+%mathematics}, Addison-Wesley, Reading, MA, 1989.
+
+%JOURNAL:
+%\bibitem{Knuth92} D.E. Knuth, \emph{Two notes on notation}, Amer.
+%Math. Monthly \textbf{99} (1992), 403--422.
+
+%NPUBLISHEDPAPER:
+%\bibitem{Simpson} H. Simpson, \emph{Proof of the Riemann
+%Hypothesis},  preprint (2003), available at 
+%\url{http://www.math.drofnats.edu/riemann.ps}.
+
+%\end{thebibliography}
+
+
+%samples
+
+
+\end{thebibliography}
+
+
+
+
+
+
+
+
+%Figures that are not used yet, but some will be during the main proof.
+
+
+% \begin{comment}
+
+\begin{figure}[htp] 
+\centering 
+\resizebox{4.5cm}{!}{\includegraphics{11.pdf}} 
+\caption{The incoming and outgoing edges of $v$ are isolated real arcs.\label{fig:11}} 
+\end{figure} 
+ 
+\begin{figure}[htp] 
+\centering 
+\resizebox{4.5cm}{!}{\includegraphics{12.pdf}} 
+\caption{The incoming and outgoing edges of $v$ are arcs, the outgoing edge is isolated.\label{fig:12}} 
+\end{figure} 
+ 
+\begin{figure}[htp] 
+\centering 
+\resizebox{4.5cm}{!}{\includegraphics{13.pdf}} 
+\caption{The incoming and outgoing edges of $v$ are arcs, the incoming edge is isolated.\label{fig:13}} 
+\end{figure} 
+ 
+\begin{figure}[htp] 
+\centering 
+\resizebox{4.5cm}{!}{\includegraphics{14.pdf}} 
+\caption{The incoming and outgoing edges of $v$ are arcs, and both are ribs of distinct tied wedges\label{fig:14}} 
+\end{figure} 
+ 
+\begin{figure}[htp] 
+\centering 
+\resizebox{4.5cm}{!}{\includegraphics{15.pdf}} 
+\caption{The incoming and outgoing edges of $v$ are arcs, and both are ribs of the same tied wedge\label{fig:15}} 
+\end{figure} 
+ 
+\begin{figure}[htp] 
+\centering 
+\resizebox{4.5cm}{!}{\includegraphics{21.pdf}} 
+\caption{The incoming edge of $v$ is an isolated arc, the outgoing edge of $v$ is an isolated edge\label{fig:21}} 
+\end{figure} 
+ 
+\begin{figure}[htp] 
+\centering 
+\resizebox{4.5cm}{!}{\includegraphics{22.pdf}} 
+\caption{The incoming edge of $v$ is an arc and a rib of a tied wedge, the outgoing edge of $v$ is an isolated edge\label{fig:22}} 
+\end{figure} 
+ 
+\begin{figure}[htp] 
+\centering 
+\resizebox{4.5cm}{!}{\includegraphics{23.pdf}} 
+\caption{The incoming edge of $v$ is an isolated arc, the outgoing edge of $v$ an external rib of a free wedge\label{fig:23}} 
+\end{figure} 
+ 
+\begin{figure}[htp] 
+\centering 
+\resizebox{4.5cm}{!}{\includegraphics{24.pdf}} 
+\caption{The incoming edge of $v$ is an arc and a rib of a tied wedge, the outgoing edge of $v$ an external rib of a free wedge\label{fig:24}} 
+\end{figure} 
+ 
+\begin{figure}[htp] 
+\centering 
+\resizebox{4.5cm}{!}{\includegraphics{25.pdf}} 
+\caption{The incoming and outgoing edges of $v$ are both external ribs of the same right tied wedge\label{fig:25}} 
+\end{figure} 
+ 
+\begin{figure}[htp] 
+\centering 
+\resizebox{4.5cm}{!}{\includegraphics{26.pdf}} 
+\caption{The backtrack edge of $v$ is an arc and an external rib of a left tied wedge\label{fig:26}} 
+\end{figure} 
+ 
+\begin{figure}[htp] 
+\centering 
+\resizebox{4.5cm}{!}{\includegraphics{31.pdf}} 
+\caption{The incoming edge of $v$ is an isolated edge, the outgoing edge of $v$ is an isolated arc\label{fig:31}} 
+\end{figure} 
+ 
+\begin{figure}[htp] 
+\centering 
+\resizebox{4.5cm}{!}{\includegraphics{32.pdf}} 
+\caption{The incoming edge of $v$ is an external rib of a free wedge, the outgoing edge of $v$ is an isolated arc\label{fig:32}} 
+\end{figure} 
+ 
+\begin{figure}[htp] 
+\centering 
+\resizebox{4.5cm}{!}{\includegraphics{33.pdf}} 
+\caption{The incoming edge of $v$ is an isolated edge, the outgoing edge of $v$ is an arc and an external rib of a left tied wedge\label{fig:33}} 
+\end{figure} 
+ 
+\begin{figure}[htp] 
+\centering 
+\resizebox{4.5cm}{!}{\includegraphics{athbr.pdf}} 
+\caption{The incoming edge of $v$ is an isolated edge, 
+the outgoing edge of $v$ is an arc and an external rib of a left tied wedge\label{fig:athbr}} 
+\end{figure} 
+ 
+\begin{figure}[htp] 
+\centering 
+\resizebox{4.5cm}{!}{\includegraphics{35.pdf}} 
+\caption{The incoming and outgoing edges of $v$ are both external ribs of the same left tied wedge\label{fig:35}} 
+\end{figure} 
+ 
+\begin{figure}[htp] 
+\centering 
+\resizebox{4.5cm}{!}{\includegraphics{36.pdf}} 
+\caption{The backtrack edge of $v$ is an arc and an external rib of a right tied wedge\label{fig:36}} 
+\end{figure} 
+ \clearpage 
+
+\begin{figure}[htp] 
+\centering 
+\resizebox{4.5cm}{!}{\includegraphics{41.pdf}} 
+\caption{The incoming and outgoing edges of $v$ are both isolated edges\label{fig:41}} 
+\end{figure} 
+ 
+%\clearpage 
+ 
+\begin{figure}[htp] 
+\centering 
+\resizebox{4.5cm}{!}{\includegraphics{42.pdf}} 
+\caption{The incoming edge of $v$ is the right external rib of a free wedge, the outgoing edge of $v$ is an isolated edge\label{fig:42}} 
+\end{figure} 
+ 
+\begin{figure}[htp] 
+\centering 
+\resizebox{4.5cm}{!}{\includegraphics{43.pdf}} 
+\caption{The incoming edge of $v$ is an isolated edge, the outgoing edge of $v$ is the left external rib of a free wedge\label{fig:43}} 
+\end{figure} 
+ 
+\begin{figure}[htp] 
+\centering 
+\resizebox{4.5cm}{!}{\includegraphics{44.pdf}} 
+\caption{The incoming and outgoing edges of $v$ are both external ribs of distinct free wedges\label{fig:44}} 
+\end{figure} 
+ 
+\begin{figure}[htp] 
+\centering 
+\resizebox{4.5cm}{!}{\includegraphics{45.pdf}} 
+\caption{The incoming and outgoing edges of $v$ are both external ribs of the same free wedge\label{fig:45}} 
+\end{figure} 
+ 
+\begin{figure}[htp] 
+\centering 
+\resizebox{4.5cm}{!}{\includegraphics{46.pdf}} 
+\caption{The backtrack edge of $v$ is an internal rib of a wedge\label{fig:46}} 
+\end{figure} 
+ 
+ %\end{comment}
+ 
+\end{document}

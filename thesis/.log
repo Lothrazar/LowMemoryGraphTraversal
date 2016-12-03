@@ -1,0 +1,18 @@
+This is TeX, Version 3.1415926 (MiKTeX 2.7) (INITEX)  24 JUN 2010 11:44
+**Files\MiKTeX 2.7\miktex\bin\initex.exe
+("C:\Program Files\MiKTeX 2.7\tex\latex\tools\.tex"
+! Missing { inserted.
+<to be read again> 
+                   {
+l.33  \message{
+               File ignored}
+? 
+)
+Runaway text?
+{File ignored} 
+! File ended while scanning text of \message.
+<inserted text> 
+                }
+<*> Files\MiKTeX 2.7\miktex\bin\initex.exe
+                                          
+? 

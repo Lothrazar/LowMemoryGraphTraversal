@@ -1,0 +1,592 @@
+
+\documentclass[11pt]{article}
+
+
+
+\newcommand{\procedure}{\bf procedure}
+\newcommand{\degr}{\bf deg}
+\newcommand{\twopath}{\bf twopath}
+\newcommand{\rev}{\bf rev}
+\newcommand{\suc}{\bf succ}
+\newcommand{\pred}{\bf pred}
+\newcommand{\prev}{\bf prev}
+\newcommand{\next}{\bf next}
+\newcommand{\nextright}{\bf nextright}
+\newcommand{\cwalk}{\bf cwalk}
+\newcommand{\entry}{\bf entry}
+\newcommand{\parent}{\bf parent}
+\newcommand{\ismin}{\bf ismin}
+\newcommand{\head}{\bf head}
+\newcommand{\tail}{\bf tail}
+\newcommand{\loc}{\bf loc}
+\newcommand{\locv}{\bf locv}
+\newcommand{\drop}{\bf drop}
+\newcommand{\bblank}{\bf blank}
+\newcommand{\virtual}{\bf virtual}
+\newcommand{\real}{\bf real}
+\newcommand{\nolabel}{\bf nolabel}
+\newcommand{\haslabel}{\bf haslabel}
+\newcommand{\setlabel}{\bf setlabel}
+\newcommand{\getlabel}{\bf getlabel}
+\newcommand{\minlabel}{\bf minlabel}
+\newcommand{\swaplabels}{\bf swaplabels}
+\newcommand{\setminlabel}{\bf setminlabel}
+\newcommand{\setdeglabel}{\bf setdeglabel}
+\newcommand{\settail}{\bf settail}
+\newcommand{\sethead}{\bf sethead}
+\newcommand{\gettail}{\bf gettail}
+\newcommand{\gethead}{\bf gethead}
+\newcommand{\haspeb}{\bf haspeb}
+\newcommand{\maxpeb}{\bf maxpeb}
+\newcommand{\enpoint}{\bf endpoint}
+\newcommand{\findport}{\bf findport}
+\newcommand{\portnum}{\bf portnum}
+\newcommand{\move}{\bf move}
+\newcommand{\shift}{\bf shift}
+\newcommand{\key}{\bf key}
+\newcommand{\closer}{\bf closer}
+\newcommand{\xcor}{\bf xcor}
+\newcommand{\ycor}{\bf ycor}
+\newcommand{\zcor}{\bf zcor}
+\newcommand{\sx}{\bf sx}
+\newcommand{\sy}{\bf sy}
+\newcommand{\sz}{\bf sz}
+\newcommand{\entryport}{\bf entryport}
+\newcommand{\fillempty}{\bf fillempty}
+
+\usepackage{amsfonts,amsthm,amssymb,amsmath}
+\usepackage{algorithmic,graphicx}
+%\usepackage{graphicx,pstricks,pst-node}
+\usepackage{setspace}
+\usepackage{verbatim}
+
+\usepackage{fancyhdr}
+\usepackage{mathtext}
+\usepackage{mathrsfs}
+\usepackage{amsfonts}
+\pagestyle{fancy}
+
+
+\lhead{Sam Bassett}
+\rhead{\today}
+
+\setlength{\topmargin}{.25in}
+\setlength{\leftmargin}{0.25in}
+\setlength{\evensidemargin}{0.52in}
+\setlength{\oddsidemargin}{0.52in} 
+\setlength{\textheight}{8.25in}
+\setlength{\textwidth}{5.98in}
+\setlength{\footskip}{.4in}
+\setlength{\headwidth}{\textwidth} 
+
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+%\newtheorem{algorithm}[theorem]{Algorithm}
+
+%\newcommand{/proof}[1]{{\emph{ Proof: }} #1 $\Box$}
+
+\begin{document}
+
+\tableofcontents
+
+\newpage
+
+
+\section{Introduction to Geometric Graphs} %%%%%%%%%%%%%%%%  1
+\label{sec-intro}
+
+
+The problem of \emph{graph traversal} is fundamental problem in graph theory, and it has applications in network discovery and 
+route optimization.  Given an unknown graph and a starting 
+vertex, can the graph be systematically traversed reaching every vertex from the starting one?  It is very useful, but not 
+neccessary, that the graph be vertex labelled, that is, we are able to distingush between two different vertices.  In this thesis 
+we are only dealing with labelled graphs.  
+
+Thus there is no algorithm that uses $O(1)$ memory, since the best possible solution 
+must at least store the labels for each vertex, which uses $\Omega(\log(n))$ with binary labels, where $n$ is the number 
+of vertices in the graph.  
+We say that a traversal algorithm uses \emph{no extra memory} if it uses this lower bound of $O(\log(n))$
+The best known 
+polynomial time solution for arbitrary graphs uses $O(\log^2(n))$ space.  This space bound has 
+recently been improved to $O(\log^{3/2}(n))$ space, if we allow nonpolynomial time.
+
+In section $2$ we provide a routing algorithm for geometric graphs that uses no extra memory.  A geometric graph is a 
+graph along with an embedding where each vertex has unique cartesian coordinates.  This method is based  on previous work by $~\cite{99}$ and 
+~\cite(01), which provided similar results for planar, quasi planar, and polyhedral graphs.  We introduce 
+the concept of an \emph{oriented walk cover} which generalizes the idea of faces of a planar graphs.  Then we provide 
+a total ordering on the edges based on the geometry of the edge.  These two structures provide the basis for the traversal.
+
+Section $3$ provides a  routing (not traversal) of directed geometric graphs.  Since we cannot create an oriented walk cover, we 
+use the added power of being able to remember a constant number of vertices that have already been visited, simulated by 
+dropping pebbles as we pass by, that can be later moved or deleted.  The memory needed thus must include the number 
+of pebbles used.  
+Here instead of using an arbitrary cartesian embedding, we use a $2$-cell embedding on some surface of genus $g$
+in $\mathbb{R}^3$.  However this polynomial algorithm uses $O(f)=O(n)$ memory in the worst case, since in the worst case we 
+need one pebble per face.  
+
+Section $4$ uses a structure called the square of the graph
+
+
+section $5$ assigns labeles based on a given $2$-walk of the graph.  A $2$-walk is a walk where each vertex is used 
+at most twice.
+
+.  
+
+\subsection{Previous Results}
+\label{ss-pr}
+...
+
+\subsection{Model of Computation}
+\label{ss-moc}
+
+This section describes the model of computation the algorithm will use, which will be important 
+to show that no extra space is required.  Any graph theory problem requires $\Omega(\log n)$ memory, 
+since $n$ vertices must be stored using binary labels.  We say a graph algorithm uses \emph{no extra memory} if uses 
+$O(\log n)$.  
+
+The model of compuatation used in this paper is a variation of the Jumping 
+Automaton for Graphs or JAG first used by Cook and Rackoff[bibtex citation here].  This setting makes 
+sense because it has been shown [find reference] since that the JAG is an equivalent model to the Turing 
+machine for undirected graph theoretic problems.  Conceptually, 
+the JAG can be thought of as a multi-head Finite State Automata, 
+where each head (represented by a pebble) is on one vertex, and each move of the JAG can move one head.  
+
+The initial state of a JAG will have all pebbles on the start vertex, and the machine 
+will be in the initial state.  One move of the JAG will, according to 
+its transition function, change its state and move one pebble.  
+A pebble can be either ``walked'' to an adjacent vertex 
+to the current one, or it can be ``jumped'' to any other vertex that already has a pebble.  The running 
+time of a JAG is the number of pebble moves that are made, and the memory required is $P \log n+\log Q$, 
+where $P$ is the number of pebbles and $Q$ is the number of states.  So as long as $P$ is a constant, 
+and $Q = n^{O(1)}$, then the JAG will requre no extra space.  
+
+Our variation of the JAG has two differences.  The first is that we need one \emph{agent} that will move 
+around the graph, and it will rest on edges instead 
+of vertices.  To simulate this, we have two designated \emph{agent pebbles} that will be placed on the endpoints of the 
+current edge.  In the case of a directed graph, the pebbles will be labelled as head or tail pebbles.  All other pebbles 
+will be \emph{stationary} pebbles; they can be dropped or removed from the current location.  
+
+
+\section{Traversal of Embedded Graphs}   %%%%%%%%%%%%%%%% 2
+\label{sec-embed}
+
+In the paper by 
+[reference] the faces of a quasi-planar graph were used to 
+traverse the graph by building a virtual tree where each face 
+in the tree is represented as a vertex in the virtual tree.  The same paper also derives from the planar embedding 
+a total order on the edges with some useful properties.  In this setting, they give a traversal algorithm 
+that uses no extra memory.  First, section\ref{ss-prelim} below defines two notions that generalizes each 
+of these structures, and then section\ref{ss-basicfunctions} describes all the basic functions 
+used in the algorithm.  
+
+\subsection{Preliminaries}
+\label{ss-prelim}
+
+Given an undirected, finite simple graph $G$, there is an equivalent directed graph 
+$G^*$ on the same vertex set as $G$, where each 
+edge $e=\{u,v\}$ in $G$ is represented by the pair of oppositely directed edges $(u,v)$ and $(v,u)$ in $G^*$.  
+If $e= (u,v)$, then we denote its reverse by $e^- = (v,u)$.  
+While the following definitions apply to any directed graph, for the purposes of the algorithm we will be 
+identifying the given undirected graph with this directed representation.  
+
+To generalize the notion of faces in a planar or quasi-planar graph, we use a structure that is 
+based on an \emph{oriented cycle double cover} that uses walks instead of cycles.
+
+\begin{definition}
+\label{def-ocw}
+Given a directed graph $G$, an \emph{oriented walk cover} $W$ is a collection of walks from $G$ such that 
+each edge in $e\in E(G)$ there is exactly one $w\in W$ such that $e\in w$.  Elements of $W$ are called 
+\emph{covering walks} of $G$.
+\end{definition} 
+
+It is clear that for any finite graph $G$, all oriented walk covers of $G$ must 
+be finite.   If we allow such a graph to have an ordering on its edges, each walk will 
+have a unique identifier which is the smallest edge on the walk.
+
+\begin{definition}
+\label{def-entry}
+If $G$ is a graph that has an oriented walk cover $W$ and a total order on its 
+edges $(E,\le)$, then the \emph{entering edge} or \emph{entry edge} of a covering walk $w\in W$ is the minimal 
+edge on $w$ with respect to the total order.  
+\end{definition}
+
+In an total ordering $(E,\le)$ on the edges of some graph $G$, we denote the minimal edge in the 
+entire graph by $e_0$.  In a planar embedding of a graph, we can induce a total order on the edges 
+based on the coordinates of the vertices; which means that any edge and its reverse will be 
+adjacent in the partial order since they have the same endpoints.  We generalize this property, as well 
+as restricting it so that the minimal edge is the only one whose reverse is also an entering edge.
+
+\begin{definition}
+\label{def-compatible}
+If $G=(V,E)$ is an undirected graph, and $G^*$ has a total order on its edges, 
+then we say that total order is \emph{compatible} if for 
+any edge $e\in V(G^*)$, there does not exist any edge $e'$ 
+such that either $e<e'<e^-$ or $e^- < e' < e$.
+\end{definition}
+
+In this setting, we will now proceed to define several basic functions that will be needed.  All of them 
+will be computable on JAG model variation defined in section \ref{ss-moc}.  Following this, the algorithm 
+is given in section\ref{ss-algorithm}.
+
+\subsection{Basic Functions}
+\label{ss-basicfunctions}
+
+%!!! add time/memory analysis of each function in JAG model: number of pebbles constant for all
+
+%Each function here can be computed on the EFAD model of computation defined in section[link], which 
+%is a restricted version of the JAG model.  
+
+Here we usually identify $G$ with $G^*$ 
+and we assume it has a compatible total order and 
+an oriented walk cover.  If $e$ is the current edge of the automata, then since 
+$e$ is in a unique covering walk, it makes sense t o
+talk about the current walk.  We can describe traversal around the current walk using the following functions.  
+So it is not ambiguous to define $\cwalk(e)$ to return the walk $w\in W$ such that $e$ is an edge of $w$.  
+Similarly, given any covering walk $w$ we define $\entry(w)$ to return the edge $e$ that is the entering 
+edge of $w$.
+
+If $e=(u,v)$, then the 
+reverse of $e$ is given by the function $\rev(e)$ that returns $e^- :=(v,u)$.  We also 
+define $\head(e)$ to return the vertex $v$, and $\tail(e)$ to return $u$.   
+Next define the predecessor function $\pred(e)$ to return the edge in $\cwalk(e)$ that adjacent 
+to $\tail(e)$; similarly the successor $\suc(e)$ will return the edge in $\cwalk(e)$ that adjacent 
+to $\head(e)$.  So to traverse the current walk means to repeatedly apply the successor function to the current 
+edge.  
+
+If $w$ is a covering walk, then 
+$\entry(w)$ returns the entering edge of $w$, as it as defined in the previous section.  
+This minimum can be computed using $O(1)$ memory 
+simply by traversing $w$ starting with any edge, comparing that starting edge with each new edge and 
+saving only the smallest.  We also define a relationship between covering walks using entering edges.  
+If $w$ does not contain $e_0$, then we can move to the walk that is 
+``adjacent'' to the entering edge of $w$ by defining $\parent(w) = \cwalk(\rev(\entry(w)))$.  
+Now we can get an immediate result that relates the entering edges of any walk and its parent walk.
+
+\begin{lemma}  
+\label{lem-parent}
+Let $G$ have an oriented walk cover and a compatible total 
+order.  If $w$ is any covering walk such that $entry(w) \ne e_0$, 
+then $\entry(\parent(w)) < \entry(w)$.  
+\end{lemma}
+
+\emph{Proof: }  Let $e_w = \entry(w)$ and $e_p = \entry(parent(w))$, and suppose to the 
+contrary that $e_w < e_p$.  By the definition of $\parent(w)$, $e_w^-$ is an edge in $\parent(w)$, 
+so neccesarily $e_p < e_w^-$.  But now $e_w < e_p < e_w^-$, a contradiction since 
+we supposed the total order is compatible.\begin{flushright} $\Box$\end{flushright} 
+
+Now we need a function to compute $e_0$ in our constant memory setting, which will use the properties 
+of the compatible total order.  
+
+Let the function $\ismin(e)$ return true if and only if the following three conditions are satisfied:
+\begin{itemize}
+\item $e = \entry(\cwalk(e))$
+\item $e^- = \entry(\cwalk(e^-))$
+\item $e < e^-$
+\end{itemize}
+
+To compute these three conditions, $\ismin(e)$ can traverse the walk containing $e$, it can easily check 
+$\entry(e)$ and $\entry(e^-)$ (which run in constant time by traversing the neccesary walk) to see 
+whether or not $e$ and $e^-$ are entering edges.  
+These conditions match the assumptions made about the ordering, now it must be proven that this 
+does exactly what we want.
+
+\begin{lemma}
+\label{lem-ismin}
+The function $\ismin(e)$ returns true if and only if $e=e_0$.
+\end{lemma}
+
+\noindent\emph{Proof: }  Suppose $\ismin(e)$ returns true for some edge $e$.  Suppose to the contrary 
+that $e_0 < e$.  Let $e_p = \entry(\parent(\cwalk(e)))$.  Since $e=\entry(\cwalk(e))$, it follows 
+from lemma [ref] that $e_p < e$.  However, by the definition of the $\parent$ function, and since $e^-$ is 
+an entering edge, $e_p=\entry(\parent(\cwalk(e)))=\entry(\cwalk(e^-))=e^-$.  However, this is a contradiction, since 
+$e_p=e^- < e$, and we assumed that $e<e^-$.  
+ 
+Now suppose $e=e_0$ and show $\ismin(e)$ must return true.  
+It is clear that $e<e^-$ and $e = \entry(\cwalk(e))$ 
+since $e$ is the global minimum edge.  If we suppose that $f=\entry(\cwalk(e^-))$ is not equal to 
+$e^-$, then $e < f < e^-$, which is a contradiction since this is a compatible total order. \begin{flushright} $\Box$\end{flushright} 
+
+
+Using all of the above functions, we can move around any given walk, and switch between walk by 
+reversing an edge.  Now we define a structure on these walks so that a walk is only ``entered'' on an 
+entering edge.  This virtual tree will use covering walks as vertices, and connect them using entering 
+edges, which shows how to traverse the graph without endlessly cycling between walks.
+
+
+\subsection{Virtual Tree}
+\label{ss-virtualtree}
+
+Given the oriented walk cover $W$ of $G$, we construct an auxiliary graph $G(W)$ using some of the functions 
+from the previous section, and then prove it is a tree. will be used to prove the corectness of 
+the algorithm.  
+Define $G(W)=(W,E(W))$ where $E(W) = \{(w,w') \: : \: \parent(w) = w' \}$. 
+
+%PROVE IT IS TREE
+
+Thus we want to show that $G(W)$ is acyclic to use it as a rooted tree, where the root represents
+ $e_0$.  Using the above lemma, the goal now is to show that there is exactly one path from 
+every node of $G(W)$ to the root.  
+
+\begin{theorem}
+\label{thm-tree}
+$G(W)$ is a tree with root $\cwalk(e_0)$. 
+\end{theorem}
+
+\noindent\emph{Proof: }
+Let $w\in W$, and let $w_0 = \cwalk(e_0)$.  First, notice that there cannot be more than one path from 
+$w$ to $w_0$, since each walk has only one entering edge.  Now, suppose to the contrary that there is no such 
+path.  Consider the sequence $w^1 = \parent(w)$, $w^2 = \parent(\parent(w))$, and so on.  So $w^i \ne w_0$ for 
+all $i$ by assumption.  In fact, $w^i > w_0$ for all $i$.  But by the previous lemma, 
+$\entry(w^{i+1}) < \entry(w^i)$, so the sequence $\{w^i \}_i$ is 
+a strictly decreasing sequence that is bounded below by $w_0$.  
+This is a contradiction since $G$ and $W$ are finite.  \begin{flushright} $\Box$\end{flushright} 
+
+
+\subsection{Algorithm}
+\label{ss-algorithm}
+
+The traversal algorithm is presented here.  It assumes that $G$ has an oriented walk cover and a 
+compatible total order, and does not check for them.  In the next section, we describe how 
+a graph can satisfy these conditions.
+
+The algorithm is mostly self explanitory.  
+The proof of correctness will follow; that is, demonstrating that each edge, vertex, and covering walk 
+is reported exactly once.  
+
+
+
+\noindent{\bf Geometric Graph Traversal Algorithm.}
+\vspace{1mm}
+
+\noindent\textbf{Input:} $e=(u,v)$ of $G(V,E)$
+
+\noindent\textbf{Output: } List of vertices, edges, and covering walks of $G$ in some order.
+
+\begin{algorithmic}[1]
+  \REPEAT[find the minimum edge $e_0$]
+    \STATE{$e\leftarrow \rev(e)$}
+    \WHILE{$e\neq \entry(\cwalk(e))$}
+      \STATE{$e\leftarrow \suc(e)$}
+    \ENDWHILE 
+  \UNTIL{$ismin(e)=TRUE$}
+  \STATE{$e_0 \leftarrow e$}
+  \REPEAT[start the traversal]
+    \STATE{$e\leftarrow suc(e)$}
+
+    \IF[check to report $e$]{$\entry(e)<\entry(cwalk(rev(e)))$}
+      \STATE{\textbf{report} $e$}
+    \ENDIF
+
+  \REPEAT[check to report $\tail(e)$]
+    \STATE{$min\leftarrow e$}
+    \STATE{$f\leftarrow\rev(e)$}
+    \IF{$f<min$}
+      \STATE{$min\leftarrow f$}
+    \ENDIF
+    \STATE{$f\leftarrow\suc(f)$}
+    \IF{$f<min$}
+      \STATE{$min\leftarrow f$}
+    \ENDIF
+  \UNTIL{$f=e$}
+  \IF{$e\leq min$}
+    \STATE{\textbf{report }$\tail(e)$}
+  \ENDIF
+
+ \REPEAT[check to report $\head(e)$]
+    \STATE{$min\leftarrow e$}
+    \STATE{$f\leftarrow\suc(f)$}
+    \IF{$f<min$}
+      \STATE{$min\leftarrow f$}
+    \ENDIF
+    \STATE{$f\leftarrow\rev(e)$}
+    \IF{$f<min$}
+      \STATE{$min\leftarrow f$}
+    \ENDIF
+  \UNTIL{$f=e$}
+  \IF{$e\leq min$}
+    \STATE{\textbf{report }$\head(e)$}
+  \ENDIF
+
+  \IF[if we have finished exploring this walk]{$e=\entry(\cwalk(e))$}
+      \STATE{{\bf report} $\cwalk(e)$}
+      \STATE{$e\leftarrow \rev(e)$}
+    \ELSE[check if we should switch to adjacent walk]
+      \IF{$\rev(e)=\entry(\cwalk(\rev(e)))$}
+        \STATE{$e\leftarrow \rev(e)$}
+      \ENDIF
+    \ENDIF
+
+
+  \UNTIL{$e=e_0$}
+
+  
+
+\end{algorithmic}  
+\vspace{5mm}
+
+\begin{theorem}
+Algorithm $1$ reports each vertex, edge, and covering walk of any graph $G$ that has an 
+oriented walk cover and a compatible total order exactly once in $O(|E| \log |E|)$ time and 
+$O(\log |V|)$ memory. 
+\end{theorem}
+
+\emph{Proof:}
+
+It will start at the edge $e$ in $G$ as input.  If $G$ is undirected, then arbitrarily pick 
+a direction for $e=(u,v)$, which initially gets reversed to $e=(v,u)$.  
+First it will search $\cwalk(e)$ for the entry edge, and then switch to the 
+parent walk when it is found.  Then this search is repeated for the new current walk.  Lemma 
+2.5[link] will guarantee that if $e_0$ has not been found, then $\entry(e)$ will be 
+smaller than the entry edge of the previous walk.  Since $G$ is finite, this loop must end 
+and find $e_0$.  
+
+Then line $8$ starts the traversal, and right away moves to $\suc(e)$, so $e_0$ is not visited 
+first.   Now the algorithm must check to see if edges and vertices need to be reported.  
+
+Each directed edge is visited only once after line $9$ finishes.  We only 
+want to report each undirected edge once, so if an edge is reported 
+its reverse cannot be.  To do this we compare the entering edges of 
+$e$ and $e^-$, and report the edge only when in the smaller one.  This is what lines 
+$10$ and $11$ do.  Since this is done exactly once for every edge $e$, and is true for 
+only one of $e$ or $e^-$, then each undirected edge is reported exactly once.  
+
+To report vertices, we check both endpoints of the current edge.  
+We consider a directed edge $e$ to be \emph{incident} with $u$ whenever 
+$u$ is either the head or tail of $e$.  So given any vertex $u$, there is one 
+minimal edge among all the edges incident with it, and we will report $u$ when 
+that edge is visited.  To examine all the edges incident with $u$ just alternate 
+between applying the $\rev$ and $\suc$ functions.  Thus lines $13$ through $40$ ensure 
+each vertex is reported exactly once.  
+
+Notice that the algorithm  performs a depth first 
+search or DFS of $G(W)$ starting and ending at $\cwalk(e_0)$, so in particular 
+every covering walk is visited.  So if the algorithm leaves a covering walk, it will 
+never enter it again.  Thus at line $42$ each covering walk is reported exactly once.  
+Since each covering walk is visited and traversed, and everything is reported exactly once, the proof 
+of correctness is complete.  
+
+Pebbles (or mark bits) only ever need to be dropped at entering edges, and they can be removed 
+once that walk is left (since the algorithm will never return to it), so only a constant number 
+of pebbles is required.  The number of basic functions in the algorithm is independent of the size 
+of $G$, so a constant number of states is needed.  Thus the algorithm can be implemented on an EFAD 
+with no extra memory.  
+
+At first let us ignore the computation time of of $\entry(w)$.  
+So the running time of lines $1$ through $7$ requires $O(|E|)$ time.  This follows since each covering walk 
+is visited at most once, and each edge is in exactly one such walk.  Similarly, the 
+main traversal phase also takes $O(|E|)$ since each covering walk is visited exactly once.  
+
+Now, the computation of $\entry(w)$ requires only $O(|w|)$ constant time, unlike the planar 
+and quasi-planar versions, since it will only need to save one edge and compare it with 
+$|w|$ edges, and the comparison is at no extra cost.  So in the end this will increase the running time 
+by $O(\sum_{w\in W}|w|) = O(|E|)$.  This concludes the proof.  $\Box$
+
+\subsection{Traversal with a Geometric Embedding}%%%%%2
+
+The algorithm in the previous section only applies to graphs that have two seemingly restrictive properties.  
+$G$ must have both a compatible total order, and an oriented walk cover.  
+In this section we demonstrate these two things exist for any simple finite graph, provided 
+we know some geometric embedding.  By embedding a graph on a surface, such that vertices do not 
+coincide and edges do not cross, we can use the faces and the coordinate system to show that a compatible 
+total order and an oriented walk cover exist.
+
+Surfaces in this section will be compact connected $2$-manifold in Euclidean $3$-space.  Non-orientable 
+surfaces are not considered for simplicity.  An embedding of a graph on such a surface is very similar 
+to a planar embedding.
+
+\begin{definition}
+An \emph{embedding} of a graph $G$ on a surface $\Sigma$ is a 
+representation of $G$ such that each vertex of $G$ is associated with one point on $\Sigma$, and 
+each edge in $G$ is assocated with one simple arc on $\Sigma$ such that:
+\begin{itemize}
+\item The endpoints of the arc associated with the edge $e$ are associated with the respective end vertices of $e$,
+\item An arc includes no points associated with any other vertices or arc interiors.
+\end{itemize} 
+\end{definition}
+
+To embed the directed graph $G^*$, we relax this slightly and allow $e$ and $e^-$ to share interior points and 
+endpoints, since they are distinguished by their directions.  
+A \emph{face} of an embedded graph is an open region bounded by arcs that contains no interior vertices.  The 
+set of faces can be found by taking the complement of the union of the points and arcs.
+Any finite graph can be embedded on such a surface in $\mathbb{R}^3$ of finite genus.  We 
+say that an embedding in $\mathbb{R}^3$ is \emph{positive} if all the vertices are in the positive octant.  
+We say that it is a \emph{straight line} embedding if all edges are straight lines.
+For our purposes, 
+the genus of the surface does not have to be minimal,
+ but the embedding does have to satisfy the following property.
+
+\begin{definition}
+A \emph{2-cell embedding} is an embedding in which every face is homeomorphic to an open disk.
+\end{definition}
+
+So in any $2$-cell embedding of an undirected graph $G$, each edge belongs to two faces.  In 
+the same embedding of $G^*$ each directed edge belongs to one face; also it is easy to orient 
+the edges so that each face is a direced walk.  This is clearly an oriented walk cover.  Since every 
+finite graph has such an embedding, then every graph has this oriented walk cover.
+
+\begin{proposition}
+If $G$ is a finite graph, then $G^*$ has an oriented walk cover.
+\end{proposition}
+
+It remains to show that any graph has a compatible total order.  To this end we use 
+a fixed embedding to construct 
+a unique identifier for each edge based on the cartesian coordinates of its 
+end vertices.  This is called the edge key.  It is a generalization of the 
+key function from [cite quasiplanar].  But first we need to be able to 
+extract geometric information from an edge using the following intermediate functions.
+
+The following functions assume that $G$ is a finite simple graph with a fixed 
+positive straight line $2$-cell 
+embedding.  If $u$ is a vertex of $G$, then we denote the cartesian coordinates of 
+$u$ by $\xcor(u)$, $\ycor(u)$, and $\zcor(u)$ respectively.  If $e$ is an 
+edge of $G$, we define three ways of measuring the slope of $e$.  Let $\sx(e)$ 
+compute the slope of $e$ after it has been projected onto the plane $x=0$; and similarly 
+for $\sy(e)$ and $\sz(e)$.  Given an edge $e=(u,v)$, we need to find out which of its 
+endpoints is in some sense closer to the origin.  We say that $\closer(e)=u$ whenever 
+$(\xcor(u),\ycor(u),\zcor(u)) < (\xcor(v),\ycor(v),\zcor(v))$, using lexographic comparison.  
+
+Now we are ready to define the key, which will induce an ordering on the edges.  For 
+the directed edge $e=(u,v)$ Define 
+
+\begin{eqnarray*}
+\key(e) =& &(\xcor(\closer(e)),\ycor(\closer(e)),\zcor(\closer(e)),\\
+& &\sx(e),\sy(e),\sz(e),\\
+& &\xcor(u),\ycor(u),\zcor(u)).
+\end{eqnarray*}
+
+By defining $e<e'$ whenever $\key(e)<\key(e')$ lexographically, we get a total order that 
+can be shown to be compatible.
+
+\begin{theorem}
+If $G$ is a finite graph, then the $\key$ defines a compatible total order for any 
+positive straight line $2$-cell embedding of $G^*$.  
+\end{theorem}
+
+\emph{Proof: }  Clearly any two edges are comparable, and distinct edges must 
+receive distinct keys, so it is a total order.  Suppose that $e < e^-$, and suppose to the contrary 
+there is some edge $f$ such that $e<f<e^-$.  Also suppose that $e=(u,v)$ and 
+$\closer(e)=u$.  First, notice that the first six coordinates 
+of $\key(e)$ and $\key(e^-)$ are always equal, so also the first six coordinates of $\key(f)$ must 
+be the same.  In fact, $u$ is an endpoint of $f$ since $\closer(f)=u$.  Since all three edges have the 
+same slope, and $f$ cannot share any interior points with $e$ and $e^-$, it must be the case that 
+$\closer(f)$ is closer to the origin than both $u$ and $v$.  But this is a contradiction, since $f$ is 
+incident with $u$.  \begin{flushright} $\Box$\end{flushright}
+
+
+Now any finite simple graph $G$ has an oriented walk cover and a compatible total order based on 
+some simple geometric information.  Therefore the algorithm from section \ref{ss-algorithm} 
+provides a $O(|E|\log|E|)$ traversal with no extra memory.
+
+
+
+\section{Citations}
+
+%finish and import bibtex file
+%(bibtex!!!)
+
+
+\end{document}
