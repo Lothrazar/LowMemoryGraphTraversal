@@ -8,7 +8,9 @@ The presentation is samMSCdefense.tex
 
 The final published version is copied in the /publishedDownload/ folder, in case the links below ever go down.  
 
-Written and complied using LaTeX markup language using emacs, images created using Xfig.
+Written and complied using LaTeX markup language using emacs : http://www.latex-project.org/about/  https://www.gnu.org/software/emacs/
+
+Images created using Xfig: http://xfig.org/
 
 Sam Bassett, all rights reserved.  
 
@@ -42,3 +44,4 @@ Direct Download: http://summit.sfu.ca/system/files/iritems1/11413/etd6191_SBasse
 Another reference https://www.sfu.ca/math/research_groups/discrete_mathematics/recent_theses.html
 
 
+Note: *caption.\* files are not my own, they are part of a downloaded caption package for LaTex *
