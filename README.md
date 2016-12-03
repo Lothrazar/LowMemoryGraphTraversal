@@ -12,6 +12,8 @@ Written and complied using LaTeX markup language using emacs : http://www.latex-
 
 Images created using Xfig: http://xfig.org/
 
+Build: use pdflatex command line program.  For details: http://aty.sdsu.edu/bibliog/latex/LaTeXtoPDF.html
+
 Sam Bassett, all rights reserved.  
 
 Published : http://summit.sfu.ca/item/11413  
@@ -44,4 +46,4 @@ Direct Download: http://summit.sfu.ca/system/files/iritems1/11413/etd6191_SBasse
 Another reference https://www.sfu.ca/math/research_groups/discrete_mathematics/recent_theses.html
 
 
-Note: *caption.\* files are not my own, they are part of a downloaded caption package for LaTex *
+Note: *caption files are not my own, they are part of a downloaded caption package for LaTex *
